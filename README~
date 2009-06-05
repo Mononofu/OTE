@@ -6,8 +6,6 @@ and MyGUI is available, although it shouldn't be difficult to include something 
 Author: Julian Schrittwieser
 Date: 2009+
 -----------------------------------------------
-
------------------------------------------------
 * REQUIREMENTS *
 - TaskEngine
 - OGRE + MyGUI + Caelum
