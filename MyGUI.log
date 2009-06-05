@@ -1,0 +1,140 @@
+ ---------------------------------------------------------------------------------------------------------------------------------- 
+                                          loging report for : 06/05/2009   23:42:19
+ ---------------------------------------------------------------------------------------------------------------------------------- 
+
+23:42:19  |  General  |  Info  |  * Initialise: Gui  |  MyGUI_Gui.cpp  |  54
+23:42:19  |  General  |  Info  |  * MyGUI version 2.2.2  |  MyGUI_Gui.cpp  |  58
+23:42:19  |  General  |  Info  |  Viewport : 1024 768  |  MyGUI_Gui.cpp  |  68
+23:42:19  |  General  |  Info  |  * Initialise: ResourceManager  |  MyGUI_ResourceManager.cpp  |  41
+23:42:19  |  General  |  Info  |  ResourceManager successfully initialized  |  MyGUI_ResourceManager.cpp  |  53
+23:42:19  |  General  |  Info  |  * Initialise: LayerManager  |  MyGUI_LayerManager.cpp  |  41
+23:42:19  |  General  |  Info  |  LayerManager successfully initialized  |  MyGUI_LayerManager.cpp  |  73
+23:42:19  |  General  |  Info  |  * Initialise: WidgetManager  |  MyGUI_WidgetManager.cpp  |  62
+23:42:19  |  General  |  Info  |  * Register widget factory 'Widget'  |  MyGUI_WidgetManager.cpp  |  118
+23:42:19  |  General  |  Info  |  * Register widget factory 'Button'  |  MyGUI_WidgetManager.cpp  |  118
+23:42:19  |  General  |  Info  |  * Register widget factory 'Window'  |  MyGUI_WidgetManager.cpp  |  118
+23:42:19  |  General  |  Info  |  * Register widget factory 'List'  |  MyGUI_WidgetManager.cpp  |  118
+23:42:19  |  General  |  Info  |  * Register widget factory 'HScroll'  |  MyGUI_WidgetManager.cpp  |  118
+23:42:19  |  General  |  Info  |  * Register widget factory 'VScroll'  |  MyGUI_WidgetManager.cpp  |  118
+23:42:19  |  General  |  Info  |  * Register widget factory 'Edit'  |  MyGUI_WidgetManager.cpp  |  118
+23:42:19  |  General  |  Info  |  * Register widget factory 'ComboBox'  |  MyGUI_WidgetManager.cpp  |  118
+23:42:19  |  General  |  Info  |  * Register widget factory 'StaticText'  |  MyGUI_WidgetManager.cpp  |  118
+23:42:19  |  General  |  Info  |  * Register widget factory 'Tab'  |  MyGUI_WidgetManager.cpp  |  118
+23:42:19  |  General  |  Info  |  * Register widget factory 'TabItem'  |  MyGUI_WidgetManager.cpp  |  118
+23:42:19  |  General  |  Info  |  * Register widget factory 'TabItem'  |  MyGUI_WidgetManager.cpp  |  118
+23:42:19  |  General  |  Info  |  * Register widget factory 'Sheet'  |  MyGUI_WidgetManager.cpp  |  118
+23:42:19  |  General  |  Info  |  * Register widget factory 'Progress'  |  MyGUI_WidgetManager.cpp  |  118
+23:42:19  |  General  |  Info  |  * Register widget factory 'ItemBox'  |  MyGUI_WidgetManager.cpp  |  118
+23:42:19  |  General  |  Info  |  * Register widget factory 'MultiList'  |  MyGUI_WidgetManager.cpp  |  118
+23:42:19  |  General  |  Info  |  * Register widget factory 'StaticImage'  |  MyGUI_WidgetManager.cpp  |  118
+23:42:19  |  General  |  Info  |  * Register widget factory 'Message'  |  MyGUI_WidgetManager.cpp  |  118
+23:42:19  |  General  |  Info  |  * Register widget factory 'RenderBox'  |  MyGUI_WidgetManager.cpp  |  118
+23:42:19  |  General  |  Info  |  * Register widget factory 'MenuCtrl'  |  MyGUI_WidgetManager.cpp  |  118
+23:42:19  |  General  |  Info  |  * Register widget factory 'MenuItem'  |  MyGUI_WidgetManager.cpp  |  118
+23:42:19  |  General  |  Info  |  * Register widget factory 'PopupMenu'  |  MyGUI_WidgetManager.cpp  |  118
+23:42:19  |  General  |  Info  |  * Register widget factory 'MenuBar'  |  MyGUI_WidgetManager.cpp  |  118
+23:42:19  |  General  |  Info  |  * Register widget factory 'ScrollView'  |  MyGUI_WidgetManager.cpp  |  118
+23:42:19  |  General  |  Info  |  * Register widget factory 'DDContainer'  |  MyGUI_WidgetManager.cpp  |  118
+23:42:19  |  General  |  Info  |  * Register widget factory 'Canvas'  |  MyGUI_WidgetManager.cpp  |  118
+23:42:19  |  General  |  Info  |  WidgetManager successfully initialized  |  MyGUI_WidgetManager.cpp  |  93
+23:42:19  |  General  |  Info  |  * Initialise: InputManager  |  MyGUI_InputManager.cpp  |  51
+23:42:19  |  General  |  Info  |  InputManager successfully initialized  |  MyGUI_InputManager.cpp  |  74
+23:42:19  |  General  |  Info  |  * Initialise: SubWidgetManager  |  MyGUI_SubWidgetManager.cpp  |  33
+23:42:19  |  General  |  Info  |  SubWidgetManager successfully initialized  |  MyGUI_SubWidgetManager.cpp  |  49
+23:42:19  |  General  |  Info  |  * Initialise: SkinManager  |  MyGUI_SkinManager.cpp  |  40
+23:42:19  |  General  |  Info  |  SkinManager successfully initialized  |  MyGUI_SkinManager.cpp  |  46
+23:42:19  |  General  |  Info  |  * Initialise: FontManager  |  MyGUI_FontManager.cpp  |  43
+23:42:19  |  General  |  Info  |  FontManager successfully initialized  |  MyGUI_FontManager.cpp  |  47
+23:42:19  |  General  |  Info  |  * Initialise: ControllerManager  |  MyGUI_ControllerManager.cpp  |  36
+23:42:19  |  General  |  Info  |  ControllerManager successfully initialized  |  MyGUI_ControllerManager.cpp  |  40
+23:42:19  |  General  |  Info  |  * Initialise: PointerManager  |  MyGUI_PointerManager.cpp  |  41
+23:42:19  |  General  |  Info  |  PointerManager successfully initialized  |  MyGUI_PointerManager.cpp  |  50
+23:42:19  |  General  |  Info  |  * Initialise: ClipboardManager  |  MyGUI_ClipboardManager.cpp  |  35
+23:42:19  |  General  |  Info  |  ClipboardManager successfully initialized  |  MyGUI_ClipboardManager.cpp  |  44
+23:42:19  |  General  |  Info  |  * Initialise: LayoutManager  |  MyGUI_LayoutManager.cpp  |  41
+23:42:19  |  General  |  Info  |  LayoutManager successfully initialized  |  MyGUI_LayoutManager.cpp  |  47
+23:42:19  |  General  |  Info  |  * Initialise: DynLibManager  |  MyGUI_DynLibManager.cpp  |  34
+23:42:19  |  General  |  Info  |  DynLibManager successfully initialized  |  MyGUI_DynLibManager.cpp  |  36
+23:42:19  |  General  |  Info  |  * Initialise: PluginManager  |  MyGUI_PluginManager.cpp  |  36
+23:42:19  |  General  |  Info  |  PluginManager successfully initialized  |  MyGUI_PluginManager.cpp  |  40
+23:42:19  |  General  |  Info  |  * Initialise: LanguageManager  |  MyGUI_LanguageManager.cpp  |  37
+23:42:19  |  General  |  Info  |  LanguageManager successfully initialized  |  MyGUI_LanguageManager.cpp  |  44
+23:42:19  |  General  |  Info  |  Load ini file 'core_keyboard.xml' from resource group : General  |  MyGUI_ResourceManager.cpp  |  171
+23:42:19  |  General  |  Info  |  Load ini file 'core_language.xml' from resource group : General  |  MyGUI_ResourceManager.cpp  |  171
+23:42:19  |  General  |  Info  |  Load ini file 'core_layer.xml' from resource group : General  |  MyGUI_ResourceManager.cpp  |  171
+23:42:19  |  General  |  Info  |  Load ini file 'core_font.xml' from resource group : General  |  MyGUI_ResourceManager.cpp  |  171
+23:42:19  |  General  |  Info  |  Load ini file 'core_theme.xml' from resource group : General  |  MyGUI_ResourceManager.cpp  |  171
+23:42:19  |  General  |  Info  |  Load ini file 'core_resource.xml' from resource group : General  |  MyGUI_ResourceManager.cpp  |  171
+23:42:19  |  General  |  Info  |  Load ini file 'core_skin.xml' from resource group : General  |  MyGUI_ResourceManager.cpp  |  171
+23:42:19  |  General  |  Info  |  Load ini file 'core_pointer.xml' from resource group : General  |  MyGUI_ResourceManager.cpp  |  171
+23:42:19  |  General  |  Info  |  Gui successfully initialized  |  MyGUI_Gui.cpp  |  112
+23:42:19  |  General  |  Info  |  Font 'Default' using texture size 1024 x 128  |  MyGUI_Font.cpp  |  205
+23:42:19  |  General  |  Info  |  Font 'Default' using real height 17 pixels  |  MyGUI_Font.cpp  |  206
+23:42:50  |  General  |  Info  |  * Shutdown: Gui  |  MyGUI_Gui.cpp  |  119
+23:42:50  |  General  |  Info  |  * Shutdown: PointerManager  |  MyGUI_PointerManager.cpp  |  57
+23:42:50  |  General  |  Info  |  PointerManager successfully shutdown  |  MyGUI_PointerManager.cpp  |  67
+23:42:50  |  General  |  Info  |  * Shutdown: InputManager  |  MyGUI_InputManager.cpp  |  81
+23:42:50  |  General  |  Info  |  InputManager successfully shutdown  |  MyGUI_InputManager.cpp  |  87
+23:42:50  |  General  |  Info  |  * Shutdown: SkinManager  |  MyGUI_SkinManager.cpp  |  53
+23:42:50  |  General  |  Info  |  SkinManager successfully shutdown  |  MyGUI_SkinManager.cpp  |  64
+23:42:50  |  General  |  Info  |  * Shutdown: SubWidgetManager  |  MyGUI_SubWidgetManager.cpp  |  56
+23:42:50  |  General  |  Info  |  SubWidgetManager successfully shutdown  |  MyGUI_SubWidgetManager.cpp  |  67
+23:42:50  |  General  |  Info  |  * Shutdown: LayerManager  |  MyGUI_LayerManager.cpp  |  80
+23:42:50  |  General  |  Info  |  destroy layer 'Back'  |  MyGUI_LayerManager.cpp  |  292
+23:42:50  |  General  |  Info  |  destroy layer 'Overlapped'  |  MyGUI_LayerManager.cpp  |  292
+23:42:50  |  General  |  Info  |  destroy layer 'Middle'  |  MyGUI_LayerManager.cpp  |  292
+23:42:50  |  General  |  Info  |  destroy layer 'Modal'  |  MyGUI_LayerManager.cpp  |  292
+23:42:50  |  General  |  Info  |  destroy layer 'Main'  |  MyGUI_LayerManager.cpp  |  292
+23:42:50  |  General  |  Info  |  destroy layer 'Popup'  |  MyGUI_LayerManager.cpp  |  292
+23:42:50  |  General  |  Info  |  destroy layer 'FadeMiddle'  |  MyGUI_LayerManager.cpp  |  292
+23:42:50  |  General  |  Info  |  destroy layer 'Info'  |  MyGUI_LayerManager.cpp  |  292
+23:42:50  |  General  |  Info  |  destroy layer 'ToolTip'  |  MyGUI_LayerManager.cpp  |  292
+23:42:50  |  General  |  Info  |  destroy layer 'DragAndDrop'  |  MyGUI_LayerManager.cpp  |  292
+23:42:50  |  General  |  Info  |  destroy layer 'FadeBusy'  |  MyGUI_LayerManager.cpp  |  292
+23:42:50  |  General  |  Info  |  destroy layer 'Pointer'  |  MyGUI_LayerManager.cpp  |  292
+23:42:50  |  General  |  Info  |  destroy layer 'Fade'  |  MyGUI_LayerManager.cpp  |  292
+23:42:50  |  General  |  Info  |  destroy layer 'Statistic'  |  MyGUI_LayerManager.cpp  |  292
+23:42:50  |  General  |  Info  |  LayerManager successfully shutdown  |  MyGUI_LayerManager.cpp  |  96
+23:42:50  |  General  |  Info  |  * Shutdown: FontManager  |  MyGUI_FontManager.cpp  |  54
+23:42:50  |  General  |  Info  |  FontManager successfully shutdown  |  MyGUI_FontManager.cpp  |  58
+23:42:50  |  General  |  Info  |  * Shutdown: ControllerManager  |  MyGUI_ControllerManager.cpp  |  47
+23:42:50  |  General  |  Info  |  ControllerManager successfully shutdown  |  MyGUI_ControllerManager.cpp  |  52
+23:42:50  |  General  |  Info  |  * Shutdown: ClipboardManager  |  MyGUI_ClipboardManager.cpp  |  51
+23:42:50  |  General  |  Info  |  ClipboardManager successfully shutdown  |  MyGUI_ClipboardManager.cpp  |  53
+23:42:50  |  General  |  Info  |  * Shutdown: LayoutManager  |  MyGUI_LayoutManager.cpp  |  54
+23:42:50  |  General  |  Info  |  LayoutManager successfully shutdown  |  MyGUI_LayoutManager.cpp  |  58
+23:42:50  |  General  |  Info  |  * Shutdown: PluginManager  |  MyGUI_PluginManager.cpp  |  47
+23:42:50  |  General  |  Info  |  PluginManager successfully shutdown  |  MyGUI_PluginManager.cpp  |  52
+23:42:50  |  General  |  Info  |  * Shutdown: DynLibManager  |  MyGUI_DynLibManager.cpp  |  43
+23:42:50  |  General  |  Info  |  DynLibManager successfully shutdown  |  MyGUI_DynLibManager.cpp  |  57
+23:42:50  |  General  |  Info  |  * Shutdown: LanguageManager  |  MyGUI_LanguageManager.cpp  |  51
+23:42:50  |  General  |  Info  |  LanguageManager successfully shutdown  |  MyGUI_LanguageManager.cpp  |  55
+23:42:50  |  General  |  Info  |  * Shutdown: ResourceManager  |  MyGUI_ResourceManager.cpp  |  60
+23:42:50  |  General  |  Info  |  ResourceManager successfully shutdown  |  MyGUI_ResourceManager.cpp  |  71
+23:42:50  |  General  |  Info  |  * Shutdown: WidgetManager  |  MyGUI_WidgetManager.cpp  |  100
+23:42:50  |  General  |  Info  |  * Unregister widget factory 'Window'  |  MyGUI_WidgetManager.cpp  |  125
+23:42:50  |  General  |  Info  |  * Unregister widget factory 'List'  |  MyGUI_WidgetManager.cpp  |  125
+23:42:50  |  General  |  Info  |  * Unregister widget factory 'VScroll'  |  MyGUI_WidgetManager.cpp  |  125
+23:42:50  |  General  |  Info  |  * Unregister widget factory 'ComboBox'  |  MyGUI_WidgetManager.cpp  |  125
+23:42:50  |  General  |  Info  |  * Unregister widget factory 'StaticImage'  |  MyGUI_WidgetManager.cpp  |  125
+23:42:50  |  General  |  Info  |  * Unregister widget factory 'StaticText'  |  MyGUI_WidgetManager.cpp  |  125
+23:42:50  |  General  |  Info  |  * Unregister widget factory 'Message'  |  MyGUI_WidgetManager.cpp  |  125
+23:42:50  |  General  |  Info  |  * Unregister widget factory 'Widget'  |  MyGUI_WidgetManager.cpp  |  125
+23:42:50  |  General  |  Info  |  * Unregister widget factory 'Button'  |  MyGUI_WidgetManager.cpp  |  125
+23:42:50  |  General  |  Info  |  * Unregister widget factory 'Edit'  |  MyGUI_WidgetManager.cpp  |  125
+23:42:50  |  General  |  Info  |  * Unregister widget factory 'Tab'  |  MyGUI_WidgetManager.cpp  |  125
+23:42:50  |  General  |  Info  |  * Unregister widget factory 'ItemBox'  |  MyGUI_WidgetManager.cpp  |  125
+23:42:50  |  General  |  Info  |  * Unregister widget factory 'Progress'  |  MyGUI_WidgetManager.cpp  |  125
+23:42:50  |  General  |  Info  |  * Unregister widget factory 'TabItem'  |  MyGUI_WidgetManager.cpp  |  125
+23:42:50  |  General  |  Info  |  * Unregister widget factory 'MultiList'  |  MyGUI_WidgetManager.cpp  |  125
+23:42:50  |  General  |  Info  |  * Unregister widget factory 'HScroll'  |  MyGUI_WidgetManager.cpp  |  125
+23:42:50  |  General  |  Info  |  * Unregister widget factory 'ScrollView'  |  MyGUI_WidgetManager.cpp  |  125
+23:42:50  |  General  |  Info  |  * Unregister widget factory 'RenderBox'  |  MyGUI_WidgetManager.cpp  |  125
+23:42:50  |  General  |  Info  |  * Unregister widget factory 'Canvas'  |  MyGUI_WidgetManager.cpp  |  125
+23:42:50  |  General  |  Info  |  * Unregister widget factory 'MenuItem'  |  MyGUI_WidgetManager.cpp  |  125
+23:42:50  |  General  |  Info  |  * Unregister widget factory 'DDContainer'  |  MyGUI_WidgetManager.cpp  |  125
+23:42:50  |  General  |  Info  |  * Unregister widget factory 'PopupMenu'  |  MyGUI_WidgetManager.cpp  |  125
+23:42:50  |  General  |  Info  |  * Unregister widget factory 'MenuBar'  |  MyGUI_WidgetManager.cpp  |  125
+23:42:50  |  General  |  Info  |  * Unregister widget factory 'MenuCtrl'  |  MyGUI_WidgetManager.cpp  |  125
+23:42:50  |  General  |  Info  |  WidgetManager successfully shutdown  |  MyGUI_WidgetManager.cpp  |  111
+23:42:50  |  General  |  Info  |  Gui successfully shutdown  |  MyGUI_Gui.cpp  |  162
