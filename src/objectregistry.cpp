@@ -11,7 +11,7 @@
 //
 #include "objectregistry.h"
 
-ObjectRegistry::ObjectRegistry() : objectIDCounter(1)
+ObjectRegistry::ObjectRegistry() : objectIDCounter(0)
 {
 }
 

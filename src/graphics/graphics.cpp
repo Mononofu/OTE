@@ -47,6 +47,7 @@ class GraphicsImpl : public Task, public Ogre::WindowEventListener, public DataP
 		void handleObjectEvents(const DataContainer& data);
 		void handleTerrainEvents(const DataContainer& data);
 		void handleWorldEvents(const DataContainer& data);
+		void handleRemovedObjects(const DataContainer& data);
 		
 		void receiveData ( std::string feedName, const DataContainer& data );
 		DataContainer getData(const DataIdentifier& id);
@@ -74,6 +75,7 @@ class GraphicsImpl : public Task, public Ogre::WindowEventListener, public DataP
 		void createScene();
 		void createFrameListener();
 		void addNode(const ObjectToCreate& object);
+		void removeNode(int ID);
 		void updatePositions();
 		void setupGUI();
 		void guiCallback(MyGUI::WidgetPtr sender);
@@ -92,12 +94,13 @@ class GraphicsImpl : public Task, public Ogre::WindowEventListener, public DataP
 		WorldGraph* backWorld;
 		/** used to synch exchange of frontWorld and backWorld **/
 		boost::mutex worldMutex;
-		boost::mutex addNodesMutex;
+		boost::mutex modifyNodesMutex;
 		
 		
 		
 		std::map<int, Ogre::SceneNode*> nodes;
 		std::vector<ObjectToCreate> nodesToAdd;
+		std::vector<int> nodesToRemove;
 		std::vector<Terrain> terrainToCreate;
 		bool newWorld;
 };
@@ -143,6 +146,7 @@ void GraphicsImpl::threadWillStart()
 	InformationManager::Instance()->subscribeToFeed("world_dynamic", boost::bind( &GraphicsImpl::handleWorldEvents, this, _1));
 	InformationManager::Instance()->subscribeToFeed("create_object", boost::bind( &GraphicsImpl::handleObjectEvents, this, _1));
 	InformationManager::Instance()->subscribeToFeed("create_terrain", boost::bind( &GraphicsImpl::handleTerrainEvents, this, _1));
+	InformationManager::Instance()->subscribeToFeed("world_removed", boost::bind( &GraphicsImpl::handleRemovedObjects, this, _1));
 	
 	Dout <<  "Creating root";
 	root.reset(new Ogre::Root ( "", "", resourcePath + "ogre.log" ));
@@ -199,6 +203,7 @@ void GraphicsImpl::threadWillStart()
 
 void GraphicsImpl::threadWillStop()
 {
+	caelumSystem.reset();
 	gui->shutdown();
 	Ogre::WindowEventUtilities::removeWindowEventListener(window, this);
 	windowClosed(window);
@@ -313,14 +318,21 @@ void GraphicsImpl::handleAppEvents(const DataContainer& data)
 void GraphicsImpl::handleObjectEvents(const DataContainer& data)
 {
 	ObjectToCreate node = boost::any_cast<ObjectToCreate>(data.data);
-	boost::mutex::scoped_lock lock(addNodesMutex);
+	boost::mutex::scoped_lock lock(modifyNodesMutex);
 	nodesToAdd.push_back( node );
+}
+
+void GraphicsImpl::handleRemovedObjects(const DataContainer& data)
+{
+	int node = boost::any_cast<int>(data.data);
+	boost::mutex::scoped_lock lock(modifyNodesMutex);
+	nodesToRemove.push_back( node );
 }
 
 void GraphicsImpl::handleTerrainEvents(const DataContainer& data)
 {
 	Terrain object = boost::any_cast<Terrain>(data.data);
-	boost::mutex::scoped_lock lock(addNodesMutex);
+	boost::mutex::scoped_lock lock(modifyNodesMutex);
 	terrainToCreate.push_back( object );
 }
 
@@ -496,6 +508,13 @@ void GraphicsImpl::addNode(const ObjectToCreate& object)
 	nodes[object.node.ID] = node;
 }
 
+void GraphicsImpl::removeNode(int ID)
+{
+	Ogre::SceneNode* node = nodes[ID];
+	node->getParent()->removeChild(node);
+	node->removeAndDestroyAllChildren();
+}
+
 void GraphicsImpl::windowResized(Ogre::RenderWindow* rw)
 {
 	unsigned int width, height, depth;
@@ -518,11 +537,16 @@ bool GraphicsImpl::windowClosing(Ogre::RenderWindow* rw)
 void GraphicsImpl::updatePositions()
 {
 	{
-		boost::mutex::scoped_lock lock(addNodesMutex);
+		boost::mutex::scoped_lock lock(modifyNodesMutex);
 		while (!nodesToAdd.empty())
 		{
 			addNode(nodesToAdd.back());
 			nodesToAdd.pop_back();
+		}
+		while (!nodesToRemove.empty())
+		{
+			removeNode(nodesToRemove.back());
+			nodesToRemove.pop_back();
 		}
 		while( !terrainToCreate.empty())
 		{

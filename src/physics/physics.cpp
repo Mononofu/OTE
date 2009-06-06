@@ -40,6 +40,8 @@ class PhysicsImpl : public Task
 		void handleAppEvents(const DataContainer& data);
 		void handleObjectEvents(const DataContainer& data);
 		void handleTerrainEvents(const DataContainer& data);
+		
+		void handleTransform(OgreNewt::Body* body , const Ogre::Quaternion& orient, const Ogre::Vector3& pos, int threadIndex);
 	private:
 		WorldGraph worldGraph;
 		OgreNewt::World* m_World;
@@ -166,6 +168,15 @@ void PhysicsImpl::handleTerrainEvents(const DataContainer& data)
 	newObject(obj.specification, obj.node.ID, obj.node.pos, obj.node.orient, obj.scale, false);
 }
 
+void PhysicsImpl::handleTransform(OgreNewt::Body* body , const Ogre::Quaternion& orient, const Ogre::Vector3& pos, int threadIndex)
+{
+	if(pos.y < -100)
+	{
+//		InformationManager::Instance()->postDataToFeed( "world_removed", DataContainer(body->m_node->ID) );
+		delete body;
+	}
+}
+
 void PhysicsImpl::newObject(const std::string& specification, int ID, const Ogre::Vector3& pos, const Ogre::Quaternion& orient, Ogre::Vector3 scale, bool dynamic)
 {
 	// look up the identifier and get relevant data - still to add
@@ -192,6 +203,7 @@ void PhysicsImpl::newObject(const std::string& specification, int ID, const Ogre
 		body->attachNode( node );	
 		body->setPositionOrientation( pos, orient );
 		body->setContinuousCollisionMode(1);
+		//body->setCustomTransformCallback( boost::bind( &PhysicsImpl::handleTransform, this, _1, _2, _3, _4 ) );
 	}
 	else
 	{

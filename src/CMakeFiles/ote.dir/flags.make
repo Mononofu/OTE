@@ -4,5 +4,5 @@
 # compile CXX with /usr/bin/c++
 CXX_FLAGS = -I/home/mononofu/Programmieren/OTE/inc -I/home/mononofu/Programmieren/include -I/home/mononofu/Programmieren/include/OGRE -I/home/mononofu/Programmieren/include/MYGUI -I/home/mononofu/Programmieren/include/Caelum -I/home/mononofu/Programmieren/include/OgreNewt -I/home/mononofu/Programmieren/include/newton   -Wall -O0 -g3
 
-CXX_DEFINES = -DDEBUG_BUILD
+CXX_DEFINES = 
 

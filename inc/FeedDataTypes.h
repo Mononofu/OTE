@@ -18,7 +18,7 @@
  * - input_keyboard: all keypresses
  * - world_dynamic: position and orientation of all dynamic nodes: attention - only a pointer is passed as a update, upon recieving the data has to be copied!
  * - world_static: same data for static objects, mostly geometry
- * - world_removed: std::vector with all objects that were removed, static or not
+ * - world_removed: ID of object that was removed, static or not
  * - create_object: objects which should be created (dynamic)
  * - create_terrain: same as create_object, but for terrain (which is static)
  * - camera_position: CameraPosition telling the graphics engine  (and possible physics too) where to look at

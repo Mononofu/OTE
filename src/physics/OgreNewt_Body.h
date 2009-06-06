@@ -435,9 +435,11 @@ public:
      * usually it is also possible to get this via: body->getCollision()
     */
     NewtonCollision *getNewtonCollision() const { return NewtonBodyGetCollision( m_body ); }
+    
+   
 
 protected:
-
+	
     NewtonBody*                     m_body;
     OgreNewt::CollisionPtr          m_collision;
     const MaterialID*               m_matid;
