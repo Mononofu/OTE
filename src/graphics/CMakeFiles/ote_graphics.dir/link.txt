@@ -1,1 +1,1 @@
-/usr/bin/c++  -fPIC   -shared -Wl,-soname,libote_graphics.so -o libote_graphics.so CMakeFiles/ote_graphics.dir/graphics.cpp.o CMakeFiles/ote_graphics.dir/listener.cpp.o -L/home/mononofu/Programmieren/lib 
+/usr/bin/c++  -fPIC   -shared -Wl,-soname,libote_graphics.so -o libote_graphics.so CMakeFiles/ote_graphics.dir/graphics.cpp.o CMakeFiles/ote_graphics.dir/listener.cpp.o -L/home/mononofu/Programmieren/lib -L/usr/local/lib 

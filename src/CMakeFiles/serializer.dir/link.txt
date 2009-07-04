@@ -1,1 +1,1 @@
-/usr/bin/c++      CMakeFiles/serializer.dir/serialize.cpp.o  -o serializer -rdynamic -L/home/mononofu/Programmieren/lib -lboost_serialization-gcc43-mt-1_38 -lboost_system-gcc43-mt-1_38 -Wl,-rpath,/home/mononofu/Programmieren/lib 
+/usr/bin/c++      CMakeFiles/serializer.dir/serialize.cpp.o  -o serializer -rdynamic -L/home/mononofu/Programmieren/lib -L/usr/local/lib -lboost_serialization-gcc43-mt-1_38 -lboost_system-gcc43-mt-1_38 -Wl,-rpath,/home/mononofu/Programmieren/lib:/usr/local/lib 

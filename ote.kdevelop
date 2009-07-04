@@ -1,14 +1,14 @@
 <?xml version = '1.0'?>
 <kdevelop>
   <general>
+  <projectmanagement>KDevCustomProject</projectmanagement>
+  <projectdirectory>/home/mononofu/Programmieren/OTE</projectdirectory>
+  <absoluteprojectpath>true</absoluteprojectpath>
     <author/>
     <email/>
     <version>$VERSION$</version>
-    <projectmanagement>KDevCustomProject</projectmanagement>
     <primarylanguage>C++</primarylanguage>
     <ignoreparts/>
-    <projectdirectory>/home/mononofu/Programmieren/OTE</projectdirectory>
-    <absoluteprojectpath>true</absoluteprojectpath>
     <secondaryLanguages>
       <language>C</language>
     </secondaryLanguages>
@@ -187,6 +187,9 @@
   </substmap>
   <kdevdebugger>
     <general>
+  <projectmanagement>KDevCustomProject</projectmanagement>
+  <projectdirectory>/home/mononofu/Programmieren/OTE</projectdirectory>
+  <absoluteprojectpath>true</absoluteprojectpath>
       <gdbpath/>
       <dbgshell/>
       <configGdbScript/>

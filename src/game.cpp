@@ -12,6 +12,7 @@
 
 #include "game.h"
 #include "objectregistry.h"
+#include <boost/shared_ptr.hpp>
 #include "boost/filesystem.hpp"
 #include <boost/filesystem/fstream.hpp>
 #include <boost/archive/text_oarchive.hpp>
@@ -22,6 +23,10 @@
 #include <boost/statechart/transition.hpp>
 #include <boost/statechart/custom_reaction.hpp>
 #include <boost/mpl/list.hpp>
+#include <ctime> 
+#include <boost/random/linear_congruential.hpp>
+#include <boost/random/uniform_real.hpp>
+#include <boost/random/variate_generator.hpp>
 #include "FeedDataTypes.h"
 
 namespace fs = boost::filesystem;
@@ -142,6 +147,10 @@ void GameImpl::handleGUIEvents ( const DataContainer& data )
 	gui_event ev = boost::any_cast<gui_event> ( data.data );
 	if ( ev == DO_BUTTON )
 	{
+		boost::minstd_rand generator( static_cast<unsigned int>(std::time(0)) );
+		boost::uniform_real<> uni_dist(-2,2);
+		boost::variate_generator<boost::minstd_rand&, boost::uniform_real<> > uni(generator, uni_dist);
+		
 		int numOfObjects = 5;
 		int spaceInBetween = 20;
 		for ( int i = 0; i < numOfObjects; i++ )
@@ -150,12 +159,12 @@ void GameImpl::handleGUIEvents ( const DataContainer& data )
 			{
 				for ( int k = 0; k < numOfObjects; k++ )
 				{
-					ObjectToCreate obj;
-					obj.node.pos = Ogre::Vector3 ( spaceInBetween/2 * numOfObjects - i * spaceInBetween, spaceInBetween/2 * numOfObjects - k * spaceInBetween, spaceInBetween/2 * numOfObjects - j * spaceInBetween );
-					obj.scale = Ogre::Vector3 ( 0.2,0.2,0.2 );
-					obj.node.orient = Ogre::Quaternion();
-					obj.node.ID = ObjectRegistry::Instance().addObject ( "ogrehead" );
-					obj.specification = "ogrehead.mesh";
+					boost::shared_ptr<ObjectToCreate> obj(new ObjectToCreate);
+					obj->node.pos = Ogre::Vector3 ( spaceInBetween/2 * numOfObjects - i * spaceInBetween + uni(), spaceInBetween/2 * numOfObjects - k * spaceInBetween + uni(), spaceInBetween/2 * numOfObjects - j * spaceInBetween + uni() );
+					obj->scale = Ogre::Vector3 ( 0.2,0.2,0.2 );
+					obj->node.orient = Ogre::Quaternion();
+					obj->node.ID = ObjectRegistry::Instance().addObject ( "ogrehead" );
+					obj->specification = "ogrehead.mesh";
 					InformationManager::Instance()->postDataToFeed ( "create_object", DataContainer ( obj ) );
 				}
 			}

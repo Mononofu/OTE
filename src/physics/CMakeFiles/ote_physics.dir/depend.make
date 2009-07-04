@@ -10507,6 +10507,7 @@ src/physics/CMakeFiles/ote_physics.dir/OgreNewt_Tools.cpp.o: /home/mononofu/Prog
 src/physics/CMakeFiles/ote_physics.dir/OgreNewt_Tools.cpp.o: /home/mononofu/Programmieren/include/OGRE/OgreVector4.h
 src/physics/CMakeFiles/ote_physics.dir/OgreNewt_Tools.cpp.o: /home/mononofu/Programmieren/include/OGRE/OgreVertexBoneAssignment.h
 src/physics/CMakeFiles/ote_physics.dir/OgreNewt_Tools.cpp.o: /home/mononofu/Programmieren/include/OGRE/OgreVertexIndexData.h
+src/physics/CMakeFiles/ote_physics.dir/OgreNewt_Tools.cpp.o: /home/mononofu/Programmieren/include/OGRE/OgreWorkQueue.h
 src/physics/CMakeFiles/ote_physics.dir/OgreNewt_Tools.cpp.o: /home/mononofu/Programmieren/include/OGRE/buildsettings.h
 src/physics/CMakeFiles/ote_physics.dir/OgreNewt_Tools.cpp.o: /home/mononofu/Programmieren/include/boost/algorithm/string/case_conv.hpp
 src/physics/CMakeFiles/ote_physics.dir/OgreNewt_Tools.cpp.o: /home/mononofu/Programmieren/include/boost/algorithm/string/compare.hpp
@@ -12694,6 +12695,7 @@ src/physics/CMakeFiles/ote_physics.dir/physics.cpp.o: /home/mononofu/Programmier
 src/physics/CMakeFiles/ote_physics.dir/physics.cpp.o: /home/mononofu/Programmieren/include/OGRE/OgreVertexIndexData.h
 src/physics/CMakeFiles/ote_physics.dir/physics.cpp.o: /home/mononofu/Programmieren/include/OGRE/OgreViewport.h
 src/physics/CMakeFiles/ote_physics.dir/physics.cpp.o: /home/mononofu/Programmieren/include/OGRE/OgreWindowEventUtilities.h
+src/physics/CMakeFiles/ote_physics.dir/physics.cpp.o: /home/mononofu/Programmieren/include/OGRE/OgreWorkQueue.h
 src/physics/CMakeFiles/ote_physics.dir/physics.cpp.o: /home/mononofu/Programmieren/include/OGRE/buildsettings.h
 src/physics/CMakeFiles/ote_physics.dir/physics.cpp.o: /home/mononofu/Programmieren/include/boost/algorithm/string/case_conv.hpp
 src/physics/CMakeFiles/ote_physics.dir/physics.cpp.o: /home/mononofu/Programmieren/include/boost/algorithm/string/compare.hpp

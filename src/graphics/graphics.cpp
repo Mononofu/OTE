@@ -31,6 +31,7 @@
 #include <string>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
+#include <boost/shared_ptr.hpp>
 
 class GraphicsImpl : public Task, public Ogre::WindowEventListener, public DataProvider
 {
@@ -52,17 +53,17 @@ class GraphicsImpl : public Task, public Ogre::WindowEventListener, public DataP
 		void receiveData ( std::string feedName, const DataContainer& data );
 		DataContainer getData(const DataIdentifier& id);
 	private:
-		boost::shared_ptr<Ogre::Root> root;
-		boost::shared_ptr<MyGUI::Gui> gui;
+		Ogre::Root* root;
+		MyGUI::Gui* gui;
 		MyGUI::WidgetPtr mainGuiWidget;
-		boost::shared_ptr<Caelum::CaelumSystem> caelumSystem;
+		Caelum::CaelumSystem* caelumSystem;
 		Ogre::RenderSystem* rSys;
 		Ogre::RenderWindow* window;
 		Ogre::SceneManager* sceneMgr;
 		Ogre::Camera* camera;
 		Ogre::Viewport* viewPort;
 		std::string resourcePath;
-		boost::shared_ptr<MyFrameListener> listener;
+		MyFrameListener* listener;
 
 		void loadPlugins();
 		void setupResources();
@@ -74,7 +75,7 @@ class GraphicsImpl : public Task, public Ogre::WindowEventListener, public DataP
 		void loadResources();
 		void createScene();
 		void createFrameListener();
-		void addNode(const ObjectToCreate& object);
+		void addNode(const boost::shared_ptr<ObjectToCreate>& object);
 		void removeNode(int ID);
 		void updatePositions();
 		void setupGUI();
@@ -99,7 +100,7 @@ class GraphicsImpl : public Task, public Ogre::WindowEventListener, public DataP
 		
 		
 		std::map<int, Ogre::SceneNode*> nodes;
-		std::vector<ObjectToCreate> nodesToAdd;
+		std::vector< boost::shared_ptr<ObjectToCreate> > nodesToAdd;
 		std::vector<int> nodesToRemove;
 		std::vector<Terrain> terrainToCreate;
 		bool newWorld;
@@ -132,8 +133,7 @@ bool GraphicsImpl::doStep()
 	updatePositions();
 	Ogre::WindowEventUtilities::messagePump();
 	//caelumSystem->notifyCameraChanged (camera);
-	root->renderOneFrame();
-	return this->running;
+	return root->renderOneFrame();
 }
 
 void GraphicsImpl::threadWillStart()
@@ -149,7 +149,7 @@ void GraphicsImpl::threadWillStart()
 	InformationManager::Instance()->subscribeToFeed("world_removed", boost::bind( &GraphicsImpl::handleRemovedObjects, this, _1));
 	
 	Dout <<  "Creating root";
-	root.reset(new Ogre::Root ( "", "", resourcePath + "ogre.log" ));
+	root = new Ogre::Root ( "", "", resourcePath + "ogre.log" );
 	
 	Dout << "Loading plugins" ;
 	loadPlugins();
@@ -194,20 +194,19 @@ void GraphicsImpl::threadWillStart()
 	root->clearEventTimes();
 	
 	InformationManager::Instance()->offerData("window", this);
-#ifdef DEBUG_BUILD
-	InformationManager::Instance()->offerData("ogre", this);
-#endif
 	
 	InformationManager::Instance()->postDataToFeed( "thread_event", DataContainer(THREAD_STARTED) );
 }
 
 void GraphicsImpl::threadWillStop()
 {
-	caelumSystem.reset();
+	delete caelumSystem;
 	gui->shutdown();
-	Ogre::WindowEventUtilities::removeWindowEventListener(window, this);
-	windowClosed(window);
-	root->shutdown();
+	delete gui;
+	delete listener;
+	//Ogre::WindowEventUtilities::removeWindowEventListener(window, this);
+	//windowClosed(window);
+	delete root;
 	//boost::this_thread::sleep(boost::posix_time::milliseconds(100));		// Wait 1/100 s
 }
 
@@ -311,13 +310,13 @@ void GraphicsImpl::handleAppEvents(const DataContainer& data)
 	if( ev == APP_SHUTDOWN )
 	{
 		Dout << "graphics received shutdown event";
-		this->running = false;
+		this->window->destroy();
 	}
 }
 
 void GraphicsImpl::handleObjectEvents(const DataContainer& data)
 {
-	ObjectToCreate node = boost::any_cast<ObjectToCreate>(data.data);
+	boost::shared_ptr<ObjectToCreate> node = boost::any_cast< boost::shared_ptr<ObjectToCreate> >(data.data);
 	boost::mutex::scoped_lock lock(modifyNodesMutex);
 	nodesToAdd.push_back( node );
 }
@@ -355,12 +354,6 @@ DataContainer GraphicsImpl::getData(const DataIdentifier& id)
 
 		return DataContainer(windowHndStr.str());
 	}
-#ifdef DEBUG_BUILD
-	else if(id == "ogre.sceneManager")
-	{
-		return DataContainer(sceneMgr);
-	}
-#endif
 	
 	return DataContainer();
 }
@@ -464,9 +457,9 @@ void GraphicsImpl::loadResources()
 
 void GraphicsImpl::createFrameListener()
 {
-	listener.reset(new MyFrameListener(window, camera, sceneMgr));
+	listener = new MyFrameListener(window, camera, sceneMgr);
 	listener->showDebugOverlay(true);
-	root->addFrameListener(listener.get());
+	root->addFrameListener(listener);
 	
 	Ogre::WindowEventUtilities::addWindowEventListener(window, this);
 
@@ -486,33 +479,38 @@ void GraphicsImpl::createScene()
 	Ogre::Light* l = sceneMgr->createLight("MainLight");
 	l->setPosition(20,80,50);
 	
-	caelumSystem.reset(new Caelum::CaelumSystem (root.get(), sceneMgr, Caelum::CaelumSystem::CAELUM_COMPONENTS_DEFAULT));
+	caelumSystem = new Caelum::CaelumSystem (root, sceneMgr, Caelum::CaelumSystem::CAELUM_COMPONENTS_DEFAULT);
 	caelumSystem->getUniversalClock ()->setTimeScale (512);
 	caelumSystem->setManageSceneFog(false);
-	window->addListener( caelumSystem.get() );
-	root->addFrameListener ( caelumSystem.get() );
+	window->addListener( caelumSystem );
+	root->addFrameListener ( caelumSystem );
 }
 
-void GraphicsImpl::addNode(const ObjectToCreate& object)
+void GraphicsImpl::addNode(const boost::shared_ptr<ObjectToCreate>& object)
 {
 	Ogre::Entity* ent;
 	Ogre::SceneNode* node;
 	//Dout << "Creating object with specification: " + object.specification;
-	ent = sceneMgr->createEntity(ObjectRegistry::Instance().getNameForID(object.node.ID) + boost::lexical_cast<std::string>(object.node.ID), object.specification);
+	ent = sceneMgr->createEntity(ObjectRegistry::Instance().getNameForID(object->node.ID) + boost::lexical_cast<std::string>(object->node.ID), object->specification);
 
 	node = sceneMgr->getRootSceneNode()->createChildSceneNode();
 	node->attachObject(ent);
-	node->setPosition(object.node.pos);
-	node->setOrientation(object.node.orient);
-	node->setScale(object.scale);
-	nodes[object.node.ID] = node;
+	node->setPosition(object->node.pos);
+	node->setOrientation(object->node.orient);
+	node->setScale(object->scale);
+	nodes[object->node.ID] = node;
 }
 
 void GraphicsImpl::removeNode(int ID)
 {
 	Ogre::SceneNode* node = nodes[ID];
-	node->getParent()->removeChild(node);
+	if(node->getParent() != NULL)
+	{
+		node->getParent()->removeChild(node);
+	}
 	node->removeAndDestroyAllChildren();
+	delete node;
+	nodes.erase(ID);
 }
 
 void GraphicsImpl::windowResized(Ogre::RenderWindow* rw)
@@ -582,7 +580,7 @@ void GraphicsImpl::updatePositions()
 
 void GraphicsImpl::setupGUI()
 {
-	gui.reset(new MyGUI::Gui());
+	gui = new MyGUI::Gui();
 	gui->initialise(window);
 	
 	mainGuiWidget = gui->createWidgetReal<MyGUI::Widget>("Default", 0.0, 0.0, 1.0, 1.0, MyGUI::Align::Default, "Main");

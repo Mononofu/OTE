@@ -24,7 +24,10 @@ using namespace OIS;
 bool MyFrameListener::frameStarted(const Ogre::FrameEvent& evt)
 {
 
-	if(mWindow->isClosed())	return false;
+	if(mWindow->isClosed())
+	{
+		return false;
+	}
 
 	return true;
 }

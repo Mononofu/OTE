@@ -421,6 +421,12 @@ OgreNewt.h
 /home/mononofu/Programmieren/OTE/src/physics/OgreNewt.h
 FeedDataTypes.h
 /home/mononofu/Programmieren/OTE/src/physics/FeedDataTypes.h
+boost/shared_ptr.hpp
+-
+boost/thread/thread.hpp
+-
+boost/thread/mutex.hpp
+-
 
 /home/mononofu/Programmieren/include/OGRE/GLX/OgreTimerImp.h
 OgrePrerequisites.h
@@ -1955,6 +1961,8 @@ OgreSingleton.h
 /home/mononofu/Programmieren/include/OGRE/OgreSingleton.h
 OgreResource.h
 /home/mononofu/Programmieren/include/OGRE/OgreResource.h
+OgreWorkQueue.h
+/home/mononofu/Programmieren/include/OGRE/OgreWorkQueue.h
 
 /home/mononofu/Programmieren/include/OGRE/OgreResourceGroupManager.h
 OgrePrerequisites.h
@@ -2019,6 +2027,8 @@ OgreResourceGroupManager.h
 /home/mononofu/Programmieren/include/OGRE/OgreResourceGroupManager.h
 OgreLodStrategyManager.h
 /home/mononofu/Programmieren/include/OGRE/OgreLodStrategyManager.h
+OgreWorkQueue.h
+/home/mononofu/Programmieren/include/OGRE/OgreWorkQueue.h
 exception
 -
 
@@ -2531,6 +2541,14 @@ windows.h
 -
 Carbon/Carbon.h
 -
+
+/home/mononofu/Programmieren/include/OGRE/OgreWorkQueue.h
+OgrePrerequisites.h
+/home/mononofu/Programmieren/include/OGRE/OgrePrerequisites.h
+OgreAtomicWrappers.h
+/home/mononofu/Programmieren/include/OGRE/OgreAtomicWrappers.h
+OgreAny.h
+/home/mononofu/Programmieren/include/OGRE/OgreAny.h
 
 /home/mononofu/Programmieren/include/OGRE/buildsettings.h
 

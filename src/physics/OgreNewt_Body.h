@@ -436,7 +436,7 @@ public:
     */
     NewtonCollision *getNewtonCollision() const { return NewtonBodyGetCollision( m_body ); }
     
-   
+    Node*                           m_node;
 
 protected:
 	
@@ -452,7 +452,7 @@ protected:
 #endif
     
     int                             m_type;
-    Node*                           m_node;
+    
     Ogre::Node*			    m_ogre_node;
 
     ForceCallback                   m_forcecallback;

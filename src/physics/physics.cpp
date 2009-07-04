@@ -19,6 +19,10 @@
 #include "OgreNewt.h"
 #include "FeedDataTypes.h"
 
+#include <boost/shared_ptr.hpp>
+#include <boost/thread/thread.hpp>
+#include <boost/thread/mutex.hpp>
+
 class PhysicsImpl : public Task
 {
 	public:
@@ -41,7 +45,7 @@ class PhysicsImpl : public Task
 		void handleObjectEvents(const DataContainer& data);
 		void handleTerrainEvents(const DataContainer& data);
 		
-		void handleTransform(OgreNewt::Body* body , const Ogre::Quaternion& orient, const Ogre::Vector3& pos, int threadIndex);
+		//void handleTransform(OgreNewt::Body* body , const Ogre::Quaternion& orient, const Ogre::Vector3& pos, int threadIndex);
 	private:
 		WorldGraph worldGraph;
 		OgreNewt::World* m_World;
@@ -50,6 +54,8 @@ class PhysicsImpl : public Task
 		
 		double workTime, overheadTime;
 		int frames;
+		
+		boost::mutex worldGraphMutex;
 };
 
 Physics::Physics() : impl(new PhysicsImpl) { }
@@ -76,11 +82,12 @@ bool PhysicsImpl::doStep()
 	Timer timer;
 	m_elapsed += timeSinceLastFrame();
 
-    // loop through and update as many times as necessary (up to 10 times maximum).
+	// loop through and update as many times as necessary (up to 10 times maximum).
 	if ((m_elapsed > m_update) && (m_elapsed < (m_update * 10)) )
 	{
 		while (m_elapsed > m_update)
 		{
+			boost::mutex::scoped_lock lock(worldGraphMutex);
 			m_World->update( m_update );
 			m_elapsed -= m_update;
 		}
@@ -96,12 +103,15 @@ bool PhysicsImpl::doStep()
             // too much time has passed (would require more than 10 updates!), so just update once and reset.
             // this often happens on the first frame of a game, where assets and other things were loading, then
             // the elapsed time since the last drawn frame is very long.
+			boost::mutex::scoped_lock lock(worldGraphMutex);
 			m_World->update( m_elapsed );
 			m_elapsed = 0.0f; // reset the elapsed time so we don't become "eternally behind".
 		}
 	}
+	boost::this_thread::sleep(boost::posix_time::milliseconds( 50.0f ));
 	workTime += timer.time();
 	timer.reset();
+	boost::mutex::scoped_lock lock(worldGraphMutex);
 	InformationManager::Instance()->postDataToFeed( "world_dynamic", DataContainer(&worldGraph) );
 	overheadTime += timer.time();
 	frames++;
@@ -116,11 +126,6 @@ void PhysicsImpl::threadWillStart()
 	InformationManager::Instance()->subscribeToFeed("create_object", boost::bind( &PhysicsImpl::handleObjectEvents, this, _1));
 	InformationManager::Instance()->subscribeToFeed("create_terrain", boost::bind( &PhysicsImpl::handleTerrainEvents, this, _1));
 	InformationManager::Instance()->postDataToFeed( "thread_event", DataContainer(THREAD_STARTED) );
-#ifdef DEBUG_BUILD
-	DataContainer myManager = InformationManager::Instance()->requestData("ogre.sceneManager", 10);
-	m_World->getDebugger().init( boost::any_cast<Ogre::SceneManager*>(myManager.data) );
-	m_World->getDebugger().showDebugInformation();
-#endif
 }
 void PhysicsImpl::threadWillStop()
 {
@@ -156,9 +161,9 @@ void PhysicsImpl::handleAppEvents(const DataContainer& data)
 
 void PhysicsImpl::handleObjectEvents(const DataContainer& data)
 {
-	ObjectToCreate obj = boost::any_cast<ObjectToCreate>(data.data);
+	boost::shared_ptr<ObjectToCreate> obj = boost::any_cast< boost::shared_ptr<ObjectToCreate> >(data.data);
 		
-	newObject(obj.specification, obj.node.ID, obj.node.pos, obj.node.orient, obj.scale);
+	newObject(obj->specification, obj->node.ID, obj->node.pos, obj->node.orient, obj->scale);
 }
 
 void PhysicsImpl::handleTerrainEvents(const DataContainer& data)
@@ -168,20 +173,23 @@ void PhysicsImpl::handleTerrainEvents(const DataContainer& data)
 	newObject(obj.specification, obj.node.ID, obj.node.pos, obj.node.orient, obj.scale, false);
 }
 
-void PhysicsImpl::handleTransform(OgreNewt::Body* body , const Ogre::Quaternion& orient, const Ogre::Vector3& pos, int threadIndex)
+/*void PhysicsImpl::handleTransform(OgreNewt::Body* body , const Ogre::Quaternion& orient, const Ogre::Vector3& pos, int threadIndex)
 {
-	if(pos.y < -100)
+	if(pos.y > -100)
 	{
-//		InformationManager::Instance()->postDataToFeed( "world_removed", DataContainer(body->m_node->ID) );
-		delete body;
+		//InformationManager::Instance()->postDataToFeed( "world_removed", DataContainer(body->m_node->ID) );
+		//delete body;
+		Dout << "Should delete this object: " << body->m_node->ID;
 	}
-}
+}*/
 
 void PhysicsImpl::newObject(const std::string& specification, int ID, const Ogre::Vector3& pos, const Ogre::Quaternion& orient, Ogre::Vector3 scale, bool dynamic)
 {
 	// look up the identifier and get relevant data - still to add
 	OgreNewt::Node *node = new OgreNewt::Node(ID);
+	boost::mutex::scoped_lock lock(worldGraphMutex);
 	worldGraph.addNode( node );
+		
 
 	if(dynamic)
 	{
@@ -198,11 +206,11 @@ void PhysicsImpl::newObject(const std::string& specification, int ID, const Ogre
 		// this is a standard callback that simply add a gravitational force (-9.8*mass) to the body.
 		body->setStandardForceCallback();
 		body->setVelocity( Ogre::Vector3(-pos.x,-pos.y,-pos.z) );
-		body->setLinearDamping(0);
+		//body->setLinearDamping(0);
 		
 		body->attachNode( node );	
 		body->setPositionOrientation( pos, orient );
-		body->setContinuousCollisionMode(1);
+		//body->setContinuousCollisionMode(1);
 		//body->setCustomTransformCallback( boost::bind( &PhysicsImpl::handleTransform, this, _1, _2, _3, _4 ) );
 	}
 	else
@@ -213,6 +221,6 @@ void PhysicsImpl::newObject(const std::string& specification, int ID, const Ogre
 		
 		body->attachNode( node );	
 		body->setPositionOrientation( pos, orient );
-	}	
+	}
 }
 
