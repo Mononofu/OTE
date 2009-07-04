@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 PROJECT(ote)
 
 #if you don't want the full compiler output, remove the following line
-SET(DEBUG_BUILD OFF)
+SET(DEBUG_BUILD ON)
 SET(CMAKE_VERBOSE_MAKEFILE ON)
 SET(LIB_INCLUDE_DIR /home/mononofu/Programmieren/include)
 
