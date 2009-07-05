@@ -31,22 +31,6 @@ enum gui_event
  	DO_BUTTON
 };
 
-enum thread_event
-{
-	THREAD_STARTING,
- 	THREAD_STARTED,
-  	THREAD_SHUTDOWN
-};
-
-// Datatype for feed 'app_event'
-enum app_event
-{
-	APP_STARTING,
-	APP_STARTED,
- 	APP_SHUTDOWN,
-  	APP_MINIMIZE
-};
-
 enum input_action
 {
 	BUTTON_PRESSED,

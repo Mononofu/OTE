@@ -22,6 +22,7 @@
 #include "objectregistry.h"
 #include "FeedDataTypes.h"
 #include "boost/lexical_cast.hpp"
+#include <algorithm>
 
 #include "listener.h"
 #include "Ogre.h"
@@ -44,13 +45,11 @@ class GraphicsImpl : public Task, public Ogre::WindowEventListener, public DataP
 		
 		void handleKeyEvents(const DataContainer& data);
 		void handleMouseEvents(const DataContainer& data);
-		void handleAppEvents(const DataContainer& data);
 		void handleObjectEvents(const DataContainer& data);
 		void handleTerrainEvents(const DataContainer& data);
 		void handleWorldEvents(const DataContainer& data);
 		void handleRemovedObjects(const DataContainer& data);
 		
-		void receiveData ( std::string feedName, const DataContainer& data );
 		DataContainer getData(const DataIdentifier& id);
 	private:
 		Ogre::Root* root;
@@ -121,10 +120,7 @@ bool GraphicsImpl::doStep()
 	if(newWorld)
 	{
 		boost::mutex::scoped_lock lock(worldMutex);
-		WorldGraph* temp;
-		temp = frontWorld;
-		frontWorld = backWorld;
-		backWorld = temp;
+		std::swap(frontWorld, backWorld);
 		newWorld = false;
 	}
 	gui->injectFrameEntered(timeSinceLastFrame());
@@ -138,15 +134,12 @@ bool GraphicsImpl::doStep()
 
 void GraphicsImpl::threadWillStart()
 {
-	InformationManager::Instance()->postDataToFeed( "thread_event", DataContainer(THREAD_STARTING) );
-
-	InformationManager::Instance()->subscribeToFeed("app_event", boost::bind( &GraphicsImpl::handleAppEvents, this, _1));
-	InformationManager::Instance()->subscribeToFeed("input_keyboard", boost::bind( &GraphicsImpl::handleKeyEvents, this, _1));
-	InformationManager::Instance()->subscribeToFeed("input_mouse", boost::bind( &GraphicsImpl::handleMouseEvents, this, _1));
-	InformationManager::Instance()->subscribeToFeed("world_dynamic", boost::bind( &GraphicsImpl::handleWorldEvents, this, _1));
-	InformationManager::Instance()->subscribeToFeed("create_object", boost::bind( &GraphicsImpl::handleObjectEvents, this, _1));
-	InformationManager::Instance()->subscribeToFeed("create_terrain", boost::bind( &GraphicsImpl::handleTerrainEvents, this, _1));
-	InformationManager::Instance()->subscribeToFeed("world_removed", boost::bind( &GraphicsImpl::handleRemovedObjects, this, _1));
+	subscribeToFeed("input_keyboard", boost::bind( &GraphicsImpl::handleKeyEvents, this, _1));
+	subscribeToFeed("input_mouse", boost::bind( &GraphicsImpl::handleMouseEvents, this, _1));
+	subscribeToFeed("world_dynamic", boost::bind( &GraphicsImpl::handleWorldEvents, this, _1));
+	subscribeToFeed("create_object", boost::bind( &GraphicsImpl::handleObjectEvents, this, _1));
+	subscribeToFeed("create_terrain", boost::bind( &GraphicsImpl::handleTerrainEvents, this, _1));
+	subscribeToFeed("world_removed", boost::bind( &GraphicsImpl::handleRemovedObjects, this, _1));
 	
 	Dout <<  "Creating root";
 	root = new Ogre::Root ( "", "", resourcePath + "ogre.log" );
@@ -194,8 +187,6 @@ void GraphicsImpl::threadWillStart()
 	root->clearEventTimes();
 	
 	InformationManager::Instance()->offerData("window", this);
-	
-	InformationManager::Instance()->postDataToFeed( "thread_event", DataContainer(THREAD_STARTED) );
 }
 
 void GraphicsImpl::threadWillStop()
@@ -301,17 +292,6 @@ void GraphicsImpl::handleMouseEvents(const DataContainer& data)
 			gui->injectMouseRelease(ev.mouseX, ev.mouseY, id);
 		}
 	}	
-}
-
-void GraphicsImpl::handleAppEvents(const DataContainer& data)
-{
-	app_event ev = boost::any_cast<app_event>(data.data);
-		
-	if( ev == APP_SHUTDOWN )
-	{
-		Dout << "graphics received shutdown event";
-		this->window->destroy();
-	}
 }
 
 void GraphicsImpl::handleObjectEvents(const DataContainer& data)

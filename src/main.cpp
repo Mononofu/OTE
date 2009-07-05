@@ -23,7 +23,7 @@ int main ( int argc, char *argv[] )
 	Game game;
 	
 #ifdef DEBUG_BUILD
-	//myManager.setThreadingMode(THREADING_SEQUENCIAL);
+	myManager.setThreadingMode(THREADING_SEQUENCIAL);
 #endif
 	
 	myManager.registerTask ( &game );

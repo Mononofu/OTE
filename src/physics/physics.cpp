@@ -41,7 +41,6 @@ class PhysicsImpl : public Task
 		void receiveData ( std::string feedName, const DataContainer& data );
 		
 		void handleKeyEvents(const DataContainer& data);
-		void handleAppEvents(const DataContainer& data);
 		void handleObjectEvents(const DataContainer& data);
 		void handleTerrainEvents(const DataContainer& data);
 		
@@ -120,12 +119,9 @@ bool PhysicsImpl::doStep()
 
 void PhysicsImpl::threadWillStart()
 {
-	InformationManager::Instance()->postDataToFeed( "thread_event", DataContainer(THREAD_STARTING) );
-	InformationManager::Instance()->subscribeToFeed("app_event", boost::bind( &PhysicsImpl::handleAppEvents, this, _1));
-	InformationManager::Instance()->subscribeToFeed("input_keyboard", boost::bind( &PhysicsImpl::handleKeyEvents, this, _1));
-	InformationManager::Instance()->subscribeToFeed("create_object", boost::bind( &PhysicsImpl::handleObjectEvents, this, _1));
-	InformationManager::Instance()->subscribeToFeed("create_terrain", boost::bind( &PhysicsImpl::handleTerrainEvents, this, _1));
-	InformationManager::Instance()->postDataToFeed( "thread_event", DataContainer(THREAD_STARTED) );
+	subscribeToFeed("input_keyboard", boost::bind( &PhysicsImpl::handleKeyEvents, this, _1));
+	subscribeToFeed("create_object", boost::bind( &PhysicsImpl::handleObjectEvents, this, _1));
+	subscribeToFeed("create_terrain", boost::bind( &PhysicsImpl::handleTerrainEvents, this, _1));
 }
 void PhysicsImpl::threadWillStop()
 {
@@ -145,17 +141,6 @@ void PhysicsImpl::handleKeyEvents(const DataContainer& data)
 	else if( ev.type == KEY_RIGHT && ev.action == BUTTON_PRESSED )
 	{
 		worldGraph.nodes.front()->setPosition( Ogre::Vector3(50.0,-10.0,-20.0) );
-	}
-}
-
-void PhysicsImpl::handleAppEvents(const DataContainer& data)
-{
-	app_event ev = boost::any_cast<app_event>(data.data);
-		
-	if( ev == APP_SHUTDOWN )
-	{
-		Dout << "physics received shutdown event";
-		this->running = false;
 	}
 }
 

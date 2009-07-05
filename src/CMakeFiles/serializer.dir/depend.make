@@ -181,6 +181,7 @@ src/CMakeFiles/serializer.dir/serialize.cpp.o: /home/mononofu/Programmieren/incl
 src/CMakeFiles/serializer.dir/serialize.cpp.o: /home/mononofu/Programmieren/include/OGRE/OgreVertexIndexData.h
 src/CMakeFiles/serializer.dir/serialize.cpp.o: /home/mononofu/Programmieren/include/OGRE/OgreViewport.h
 src/CMakeFiles/serializer.dir/serialize.cpp.o: /home/mononofu/Programmieren/include/OGRE/OgreWindowEventUtilities.h
+src/CMakeFiles/serializer.dir/serialize.cpp.o: /home/mononofu/Programmieren/include/OGRE/OgreWorkQueue.h
 src/CMakeFiles/serializer.dir/serialize.cpp.o: /home/mononofu/Programmieren/include/OGRE/buildsettings.h
 src/CMakeFiles/serializer.dir/serialize.cpp.o: /home/mononofu/Programmieren/include/OgreNewt/OgreNewt.h
 src/CMakeFiles/serializer.dir/serialize.cpp.o: /home/mononofu/Programmieren/include/OgreNewt/OgreNewt_BasicJoints.h

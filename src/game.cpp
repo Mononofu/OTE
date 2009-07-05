@@ -84,7 +84,6 @@ class GameImpl : public Task
 		void handleKeyEvents ( const DataContainer& data );
 		void handleGUIEvents ( const DataContainer& data );
 		void handleThreadEvents ( const DataContainer& data );
-		void handleAppEvents ( const DataContainer& data );
 		bool doStep();
 		void threadWillStart();
 		void threadWillStop();
@@ -196,18 +195,6 @@ void GameImpl::handleThreadEvents ( const DataContainer& data )
 	}
 }
 
-
-void GameImpl::handleAppEvents ( const DataContainer& data )
-{
-	app_event ev = boost::any_cast<app_event> ( data.data );
-
-	if ( ev == APP_SHUTDOWN )
-	{
-		Dout << "game received shutdown event";
-		this->running = false;
-	}
-}
-
 GameImpl::GameImpl() : loadingThreads ( 0 )
 {
 	myState.initiate();
@@ -223,15 +210,14 @@ bool GameImpl::doStep()
 #ifndef DEBUG_BUILD
 	boost::this_thread::sleep ( boost::posix_time::milliseconds ( 10 ) );		// Wait 1/100 s
 #endif
-	return this->running;
+	return true;
 }
 
 void GameImpl::threadWillStart()
 {
-	InformationManager::Instance()->subscribeToFeed ( "app_event", boost::bind ( &GameImpl::handleAppEvents, this, _1 ) );
-	InformationManager::Instance()->subscribeToFeed ( "thread_event", boost::bind ( &GameImpl::handleThreadEvents, this, _1 ) );
-	InformationManager::Instance()->subscribeToFeed ( "input_keyboard", boost::bind ( &GameImpl::handleKeyEvents, this, _1 ) );
-	InformationManager::Instance()->subscribeToFeed ( "gui_event", boost::bind ( &GameImpl::handleGUIEvents, this, _1 ) );
+	subscribeToFeed ( "thread_event", boost::bind ( &GameImpl::handleThreadEvents, this, _1 ) );
+	subscribeToFeed ( "input_keyboard", boost::bind ( &GameImpl::handleKeyEvents, this, _1 ) );
+	subscribeToFeed ( "gui_event", boost::bind ( &GameImpl::handleGUIEvents, this, _1 ) );
 }
 
 void GameImpl::threadWillStop()

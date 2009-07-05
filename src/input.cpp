@@ -30,7 +30,6 @@ class InputImpl : public Task, public OIS::MouseListener, public OIS::KeyListene
    		 // KeyListener
 		bool keyPressed(const OIS::KeyEvent &e);
 		bool keyReleased(const OIS::KeyEvent &e);
-		void handleAppEvents(const DataContainer& data);
 		
 		bool doStep();
 		void threadWillStart();
@@ -62,9 +61,6 @@ bool InputImpl::doStep()
 
 void InputImpl::threadWillStart()
 {
-	InformationManager::Instance()->postDataToFeed( "thread_event", DataContainer(THREAD_STARTING) );
-	InformationManager::Instance()->subscribeToFeed("app_event", boost::bind( &InputImpl::handleAppEvents, this, _1) );
-	
 	OIS::ParamList pl;
 	DataContainer myHandle = InformationManager::Instance()->requestData("window.handle", 10);
 	pl.insert(std::make_pair(std::string("WINDOW"), boost::any_cast<std::string>(myHandle.data) ));
@@ -93,25 +89,12 @@ void InputImpl::threadWillStart()
 	mMouse->setEventCallback(this);
 	mMouse->hide(true);
 	mKeyboard->setEventCallback(this);
-	InformationManager::Instance()->postDataToFeed( "thread_event", DataContainer(THREAD_STARTED) );
 }
 
 void InputImpl::threadWillStop()
 {
 	mMouse->setEventCallback(NULL);
 	mKeyboard->setEventCallback(NULL);
-}
-
-void InputImpl::handleAppEvents(const DataContainer& data)
-{
-	app_event ev = boost::any_cast<app_event>(data.data);
-		
-	if( ev == APP_SHUTDOWN )
-	{
-		Dout << "input received shutdown event";
-		this->running = false;
-	}
-	
 }
 
 bool InputImpl::mouseMoved(const OIS::MouseEvent &e)

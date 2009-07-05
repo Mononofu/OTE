@@ -15,6 +15,8 @@ FeedDataTypes.h
 /home/mononofu/Programmieren/OTE/src/graphics/FeedDataTypes.h
 boost/lexical_cast.hpp
 /home/mononofu/Programmieren/OTE/src/graphics/boost/lexical_cast.hpp
+algorithm
+-
 listener.h
 /home/mononofu/Programmieren/OTE/src/graphics/listener.h
 Ogre.h
@@ -30,6 +32,8 @@ string
 boost/thread/thread.hpp
 -
 boost/thread/mutex.hpp
+-
+boost/shared_ptr.hpp
 -
 
 /home/mononofu/Programmieren/OTE/src/graphics/listener.cpp
