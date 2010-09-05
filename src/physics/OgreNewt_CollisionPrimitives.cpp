@@ -1,3 +1,4 @@
+#include "OgreNewt_stdafx.h"
 #include "OgreNewt_CollisionPrimitives.h"
 #include "OgreNewt_Tools.h"
 #include "OgreNewt_RayCast.h"
@@ -30,13 +31,13 @@ namespace OgreNewt
         Box::Box(const World* world) : ConvexCollision( world )
         {}
 
-        Box::Box( const World* world, const Ogre::Vector3& size, const Ogre::Quaternion& orient, const Ogre::Vector3& pos ) : ConvexCollision( world )
+        Box::Box( const World* world, const Ogre::Vector3& size, int id, const Ogre::Quaternion& orient, const Ogre::Vector3& pos ) : ConvexCollision( world )
         {
             float matrix[16];
 
             OgreNewt::Converters::QuatPosToMatrix( orient, pos, &matrix[0] );
 
-            m_col = NewtonCreateBox( m_world->getNewtonWorld(), (float)size.x, (float)size.y, (float)size.z, &matrix[0] );
+            m_col = NewtonCreateBox( m_world->getNewtonWorld(), (float)size.x, (float)size.y, (float)size.z, id, &matrix[0] );
         }
 
 
@@ -45,13 +46,13 @@ namespace OgreNewt
         Ellipsoid::Ellipsoid(const World* world) : ConvexCollision( world )
         {}
 
-        Ellipsoid::Ellipsoid( const World* world, const Ogre::Vector3& size, const Ogre::Quaternion& orient, const Ogre::Vector3& pos ) : ConvexCollision( world )
+        Ellipsoid::Ellipsoid( const World* world, const Ogre::Vector3& size, int id, const Ogre::Quaternion& orient, const Ogre::Vector3& pos ) : ConvexCollision( world )
         {
             float matrix[16];
 
             OgreNewt::Converters::QuatPosToMatrix( orient, pos, &matrix[0] );
 
-            m_col = NewtonCreateSphere( m_world->getNewtonWorld(), (float)size.x, (float)size.y, (float)size.z, &matrix[0] );
+            m_col = NewtonCreateSphere( m_world->getNewtonWorld(), (float)size.x, (float)size.y, (float)size.z, id, &matrix[0] );
         }
 
 
@@ -59,14 +60,14 @@ namespace OgreNewt
         Cylinder::Cylinder(const World* world) : ConvexCollision( world )
         {}
 
-        Cylinder::Cylinder( const World* world, Ogre::Real radius, Ogre::Real height, 
+        Cylinder::Cylinder( const World* world, Ogre::Real radius, Ogre::Real height, int id,
                                     const Ogre::Quaternion& orient, const Ogre::Vector3& pos ) : ConvexCollision( world )
         {
             float matrix[16];
 
             OgreNewt::Converters::QuatPosToMatrix( orient, pos, &matrix[0] );
 
-            m_col = NewtonCreateCylinder( m_world->getNewtonWorld(), (float)radius, (float)height, &matrix[0] );
+            m_col = NewtonCreateCylinder( m_world->getNewtonWorld(), (float)radius, (float)height, id, &matrix[0] );
         }
 
 
@@ -74,14 +75,14 @@ namespace OgreNewt
         Capsule::Capsule(const World* world) : ConvexCollision( world )
         {}
 
-        Capsule::Capsule( const World* world, Ogre::Real radius, Ogre::Real height, 
+        Capsule::Capsule( const World* world, Ogre::Real radius, Ogre::Real height, int id,
                                     const Ogre::Quaternion& orient, const Ogre::Vector3& pos ) : ConvexCollision( world )
         {
             float matrix[16];
 
             OgreNewt::Converters::QuatPosToMatrix( orient, pos, &matrix[0] );
 
-            m_col = NewtonCreateCapsule( m_world->getNewtonWorld(), (float)radius, (float)height, &matrix[0] );
+            m_col = NewtonCreateCapsule( m_world->getNewtonWorld(), (float)radius, (float)height, id, &matrix[0] );
         }
 
 
@@ -89,28 +90,28 @@ namespace OgreNewt
         Cone::Cone(const World* world) : ConvexCollision( world )
         {}
 
-        Cone::Cone( const World* world, Ogre::Real radius, Ogre::Real height, 
+        Cone::Cone( const World* world, Ogre::Real radius, Ogre::Real height, int id,
                                     const Ogre::Quaternion& orient, const Ogre::Vector3& pos ) : ConvexCollision( world )
         {
             float matrix[16];
 
             OgreNewt::Converters::QuatPosToMatrix( orient, pos, &matrix[0] );
 
-            m_col = NewtonCreateCone( m_world->getNewtonWorld(), (float)radius, (float)height, &matrix[0] );
+            m_col = NewtonCreateCone( m_world->getNewtonWorld(), (float)radius, (float)height, id, &matrix[0] );
         }
 
         // OgreNewt::CollisionPrimitives::ChamferCylinder
         ChamferCylinder::ChamferCylinder(const World* world) : ConvexCollision( world )
         {}
 
-        ChamferCylinder::ChamferCylinder( const World* world, Ogre::Real radius, Ogre::Real height, 
+        ChamferCylinder::ChamferCylinder( const World* world, Ogre::Real radius, Ogre::Real height, int id,
                                     const Ogre::Quaternion& orient, const Ogre::Vector3& pos ) : ConvexCollision( world )
         {
             float matrix[16];
 
             OgreNewt::Converters::QuatPosToMatrix( orient, pos, &matrix[0] );
 
-            m_col = NewtonCreateChamferCylinder( m_world->getNewtonWorld(), (float)radius, (float)height, &matrix[0] );
+            m_col = NewtonCreateChamferCylinder( m_world->getNewtonWorld(), (float)radius, (float)height, id, &matrix[0] );
         }
 
 
@@ -119,16 +120,14 @@ namespace OgreNewt
         ConvexHull::ConvexHull(const World* world) : ConvexCollision( world )
         {}
 
-        ConvexHull::ConvexHull( const World* world, Ogre::Entity* obj, const Ogre::Quaternion& orient, const Ogre::Vector3& pos, Ogre::Real tolerance, const Ogre::Vector3& forceScale ) : ConvexCollision( world )
+        ConvexHull::ConvexHull( const World* world, Ogre::Entity* obj, int id, const Ogre::Quaternion& orient, const Ogre::Vector3& pos, Ogre::Real tolerance, const Ogre::Vector3& forceScale ) : ConvexCollision( world )
         {
             Ogre::Vector3 scale(1.0,1.0,1.0);
             
-
             //get the mesh!
             //Ogre::Entity* obj = (Ogre::Entity*)node->getAttachedObject(0);
             Ogre::MeshPtr mesh = obj->getMesh();
 
-                       
             // get scale, if attached to node
             Ogre::Node * node = obj->getParentNode();
             if (node) scale = node->getScale();
@@ -235,7 +234,7 @@ namespace OgreNewt
             OgreNewt::Converters::QuatPosToMatrix( orient, pos, &matrix[0] );
     
             //okay, let's try making the ConvexHull!
-            m_col = NewtonCreateConvexHull( m_world->getNewtonWorld(), (int)total_verts, (float*)&vertices[0].x, sizeof(Ogre::Vector3), tolerance, &matrix[0] );
+            m_col = NewtonCreateConvexHull( m_world->getNewtonWorld(), (int)total_verts, (float*)&vertices[0].x, sizeof(Ogre::Vector3), tolerance, id, &matrix[0] );
 
             delete []vertices;
 
@@ -243,16 +242,14 @@ namespace OgreNewt
 
 
         // OgreNewt::CollisionPrimitives::ConvexHull
-        ConvexHull::ConvexHull( const World* world, const Ogre::Vector3* verts, int vertcount, const Ogre::Quaternion& orient, const Ogre::Vector3& pos, Ogre::Real tolerance ) : ConvexCollision( world )
+        ConvexHull::ConvexHull( const World* world, const Ogre::Vector3* verts, int vertcount, int id, const Ogre::Quaternion& orient, const Ogre::Vector3& pos, Ogre::Real tolerance ) : ConvexCollision( world )
         {
             float matrix[16];
             OgreNewt::Converters::QuatPosToMatrix( orient, pos, &matrix[0] );
 
             //make the collision primitive.
-            m_col = NewtonCreateConvexHull( m_world->getNewtonWorld(), vertcount, (float*)&verts[0].x, sizeof(Ogre::Vector3), tolerance, &matrix[0]);
+            m_col = NewtonCreateConvexHull( m_world->getNewtonWorld(), vertcount, (float*)&verts[0].x, sizeof(Ogre::Vector3), tolerance, id, &matrix[0]);
         }
-
-
 
 
         TreeCollision::TreeCollision( const World* world) : Collision(world)
@@ -260,11 +257,11 @@ namespace OgreNewt
         }
 
 
-        TreeCollision::TreeCollision( const World* world, Ogre::Entity* obj, bool optimize, FaceWinding fw ) : Collision( world )
+        TreeCollision::TreeCollision( const World* world, Ogre::Entity* obj, bool optimize, int id, FaceWinding fw ) : Collision( world )
         {
             Ogre::Vector3 scale;
 
-            start();
+            start(id);
 
             Ogre::MeshPtr mesh = obj->getMesh();
 
@@ -392,11 +389,10 @@ namespace OgreNewt
             //done!
             finish( optimize );
         }
-
-
-	TreeCollision::TreeCollision( const World* world, Ogre::MeshPtr mesh, bool optimize, FaceWinding fw,  Ogre::Vector3 scale ) : Collision( world )
-        {
-            start();
+        
+        TreeCollision::TreeCollision( const World* world, Ogre::MeshPtr mesh, bool optimize, int id, Ogre::Vector3 scale, FaceWinding fw)  : Collision( world )
+	{
+            start(id);
 
             //find number of sub-meshes
             unsigned short sub = mesh->getNumSubMeshes();
@@ -519,10 +515,9 @@ namespace OgreNewt
             finish( optimize );
         }
 
-
-        TreeCollision::TreeCollision(const OgreNewt::World *world, int numVertices, int numIndices, const float *vertices, const int *indices, bool optimize, FaceWinding fw) : OgreNewt::Collision( world )
+        TreeCollision::TreeCollision(const OgreNewt::World *world, int numVertices, int numIndices, const float *vertices, const int *indices, bool optimize, int id, FaceWinding fw) : OgreNewt::Collision( world )
         {
-            start();
+            start(id);
  
             int numPolys = numIndices / 3;
  
@@ -561,9 +556,9 @@ namespace OgreNewt
         }
 
 
-        TreeCollision::TreeCollision( const World* world, int numVertices, Ogre::Vector3* vertices, Ogre::IndexData* indexData, bool optimize, FaceWinding fw) : Collision( world )
+        TreeCollision::TreeCollision( const World* world, int numVertices, Ogre::Vector3* vertices, Ogre::IndexData* indexData, bool optimize, int id, FaceWinding fw) : Collision( world )
         {
-            start();
+            start(id);
 
             unsigned int numPolys = indexData->indexCount / 3;
             Ogre::HardwareIndexBufferSharedPtr hwIndexBuffer=indexData->indexBuffer;
@@ -625,9 +620,9 @@ namespace OgreNewt
         } 
 
 
-        void TreeCollision::start()
+        void TreeCollision::start(int id)
         {
-            m_col = NewtonCreateTreeCollision( m_world->getNewtonWorld() );
+            m_col = NewtonCreateTreeCollision( m_world->getNewtonWorld(), id );
             NewtonTreeCollisionBeginBuild( m_col );
         }
 
@@ -672,16 +667,16 @@ namespace OgreNewt
         {
         }
         
-        void TreeCollisionSceneParser::parseScene( Ogre::SceneNode *startNode, bool optimize, FaceWinding fw)
+        void TreeCollisionSceneParser::parseScene( Ogre::SceneNode *startNode, int id, bool optimize, FaceWinding fw)
         {
             count = 0;
 
-            start();
+            start(id);
 
             // parse the individual nodes.
             Ogre::Quaternion rootOrient = Ogre::Quaternion::IDENTITY;
             Ogre::Vector3 rootPos = Ogre::Vector3::ZERO;
-            Ogre::Vector3 rootScale = Ogre::Vector3::UNIT_SCALE;
+            Ogre::Vector3 rootScale = startNode->getScale();;
 
             _parseNode( startNode, rootOrient, rootPos, rootScale, fw );
 
@@ -846,7 +841,7 @@ namespace OgreNewt
         CompoundCollision::CompoundCollision(const World* world) : Collision( world )
         {}
         
-        CompoundCollision::CompoundCollision( const World* world, std::vector<OgreNewt::CollisionPtr> col_array ) : Collision( world )
+        CompoundCollision::CompoundCollision( const World* world, std::vector<OgreNewt::CollisionPtr> col_array, int id ) : Collision( world )
         {
             //get the number of elements.
             unsigned int num = col_array.size();
@@ -859,7 +854,7 @@ namespace OgreNewt
                 array[i] = (NewtonCollision*)col_array[i]->getNewtonCollision();
             }
 
-            m_col = NewtonCreateCompoundCollision( world->getNewtonWorld(), num, array );
+            m_col = NewtonCreateCompoundCollision( world->getNewtonWorld(), num, array, id );
 
 
             delete[] array;
@@ -870,7 +865,7 @@ namespace OgreNewt
         Pyramid::Pyramid(const World* world) : ConvexCollision( world )
         {}
 
-        Pyramid::Pyramid( const World* world, const Ogre::Vector3& size, const Ogre::Quaternion& orient, const Ogre::Vector3& pos, Ogre::Real tolerance ) : ConvexCollision( world )
+        Pyramid::Pyramid( const World* world, const Ogre::Vector3& size, int id, const Ogre::Quaternion& orient, const Ogre::Vector3& pos, Ogre::Real tolerance ) : ConvexCollision( world )
         {
             float matrix[16];
 
@@ -899,18 +894,56 @@ namespace OgreNewt
             vertices [idx++] = 0.0f;
 
             //make the collision primitive.
-            m_col = NewtonCreateConvexHull( m_world->getNewtonWorld(), 5, vertices, sizeof(float)*3, tolerance, &matrix[0]);
+            m_col = NewtonCreateConvexHull( m_world->getNewtonWorld(), 5, vertices, sizeof(float)*3, tolerance, id, &matrix[0]);
 
 
             delete []vertices;
         }
 
+		/*
+		HeightField::HeightField(const OgreNewt::World *world, int width, int height, int gridsDiagonals, unsigned short *elevationMap, char *attributeMap, Ogre::Real horizontalScale, Ogre::Real verticleScale, int shapeID) : OgreNewt::Collision (world)
+		{
+			m_col = NewtonCreateHeightFieldCollision(world->getNewtonWorld(),width,height,gridsDiagonals,elevationMap,attributeMap,float(horizontalScale),float(verticleScale),shapeID);
+		}
 
+		HeightField::HeightField(const OgreNewt::World *world, Ogre::Terrain *terrain, int shapeID) : OgreNewt::Collision (world)
+		{
+			int width = terrain->getSize();
+			int height = width;
+			int gridsDiagonals = 0;
 
+			char *attributes;
+			unsigned short *elevations;
+
+			float *hData = terrain->getHeightData();
+			float verticleScale = 65535 / (terrain->getMaxHeight() - terrain->getMinHeight());
+			Ogre::Real horizontalScale = terrain->getWorldSize() / (terrain->getSize() - 1);
+
+			elevations = (unsigned short*) malloc (width * height * sizeof (unsigned short));
+			attributes = (char*) malloc (width * height * sizeof (char));
+			memset (attributes, 1, width * height * sizeof (char));
+
+			//HeightData reversed and mirror on X axis
+			int x = 0;
+
+			for (int i = width * height - 1; i >= 0; i--)
+			{
+				elevations[i-width+(x*2)+1] = unsigned short(*(hData)*verticleScale);
+				hData++;
+				x++;
+				if (x == width) x = 0; 
+			}
+
+			createHeightFieldCollision(world, width, height, gridsDiagonals, elevations, attributes, horizontalScale, float(1 / verticleScale), shapeID);
+
+			free (elevations);
+			free (attributes);
+		}
+
+		void HeightField::createHeightFieldCollision(const OgreNewt::World *world, int width, int height, int gridsDiagonals, unsigned short *elevationMap, char *attributeMap, Ogre::Real horizontalScale, Ogre::Real verticleScale, int shapeID) 
+		{
+			m_col = NewtonCreateHeightFieldCollision(world->getNewtonWorld(), width, height, gridsDiagonals, elevationMap, attributeMap, float(horizontalScale), float(verticleScale), shapeID);
+		}
+		*/
     }   // end namespace CollisionPrimitives
-
 }   // end namespace OgreNewt
-
-
-
-

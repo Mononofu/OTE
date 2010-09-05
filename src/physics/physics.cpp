@@ -107,7 +107,7 @@ bool PhysicsImpl::doStep()
 			m_elapsed = 0.0f; // reset the elapsed time so we don't become "eternally behind".
 		}
 	}
-	boost::this_thread::sleep(boost::posix_time::milliseconds( 50.0f ));
+	boost::this_thread::sleep(boost::posix_time::milliseconds( 10.0f ));
 	workTime += timer.time();
 	timer.reset();
 	boost::mutex::scoped_lock lock(worldGraphMutex);
@@ -179,7 +179,7 @@ void PhysicsImpl::newObject(const std::string& specification, int ID, const Ogre
 	if(dynamic)
 	{
 		// collision primitve - type and size should be determined according to a data file
-		OgreNewt::ConvexCollisionPtr col = OgreNewt::ConvexCollisionPtr(new OgreNewt::CollisionPrimitives::Cylinder(m_World, 4.9, 9.8));
+		OgreNewt::ConvexCollisionPtr col = OgreNewt::ConvexCollisionPtr(new OgreNewt::CollisionPrimitives::Cylinder(m_World, Ogre::Real(4.9), Ogre::Real(9.8), ID));
 
 		// now we make a new rigid body based on this collision shape.
 		OgreNewt::Body* body = new OgreNewt::Body( m_World, col );
@@ -195,13 +195,15 @@ void PhysicsImpl::newObject(const std::string& specification, int ID, const Ogre
 		
 		body->attachNode( node );	
 		body->setPositionOrientation( pos, orient );
-		//body->setContinuousCollisionMode(1);
+		body->setContinuousCollisionMode(1);
 		//body->setCustomTransformCallback( boost::bind( &PhysicsImpl::handleTransform, this, _1, _2, _3, _4 ) );
 	}
 	else
 	{
 		DataContainer data = ResourceManager::Instance().loadResource(specification);
-		OgreNewt::CollisionPtr col = boost::shared_ptr<OgreNewt::Collision>(new OgreNewt::CollisionPrimitives::TreeCollision(m_World, boost::any_cast<Ogre::MeshPtr>(data.data), true, OgreNewt::CollisionPrimitives::FW_DEFAULT, scale));
+
+		OgreNewt::CollisionPtr col = OgreNewt::CollisionPtr(new OgreNewt::CollisionPrimitives::TreeCollision(m_World, boost::any_cast<Ogre::MeshPtr>(data.data), true, ID, scale, OgreNewt::CollisionPrimitives::FW_DEFAULT));
+		
 		OgreNewt::Body* body = new OgreNewt::Body(m_World, col);
 		
 		body->attachNode( node );	

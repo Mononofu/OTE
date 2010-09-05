@@ -198,6 +198,10 @@ fragment_program CaelumSample/PSSM/OneLightFP cg
 
         param_named_auto light_position_view_space light_position_view_space 0
         param_named_auto derived_light_diffuse_colour derived_light_diffuse_colour 0
+
+        param_named pssmSplitPoints float4 0 0 0 0
+        // 0 by default; only used for materials which don't cull backfaces.
+        param_named shadowBias float 0
     }
 }
 
@@ -217,6 +221,9 @@ fragment_program CaelumSample/PSSM/OneLightFP/Terrain cg
 
         param_named_auto light_position_view_space light_position_view_space 0
         param_named_auto derived_light_diffuse_colour derived_light_diffuse_colour 0
+
+        param_named pssmSplitPoints float4 0 0 0 0
+        param_named shadowBias float 0
     }
 }
 
@@ -366,6 +373,10 @@ abstract material CaelumSample/AlphaRejectionBase: CaelumSample/Base
 
         pass Directional
         {
+            fragment_program_ref *
+            {
+                param_named shadowBias float -0.0001
+            }
             cull_hardware none
             alpha_rejection greater_equal 128
         }

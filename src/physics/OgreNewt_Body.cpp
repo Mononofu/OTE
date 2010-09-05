@@ -1,3 +1,4 @@
+#include "OgreNewt_stdafx.h"
 #include "OgreNewt_Body.h"
 #include "OgreNewt_World.h"
 #include "OgreNewt_Collision.h"
@@ -18,16 +19,30 @@ Body::Body( const World* W, const OgreNewt::CollisionPtr& col, int bodytype )
     m_ogre_node = NULL;
     m_matid = NULL;
     
-    m_userdata = NULL;
+    m_userdata = 0;
 
     m_forcecallback = NULL;
-    m_transformcallback = NULL;
+//  m_transformcallback = NULL;
     m_buoyancycallback = NULL;
+	m_nodeupdatenotifycallback = NULL;
+
+    //m_nodeupdateneeded = false;
+
+	m_nodePosit = Ogre::Vector3 (0.0f, 0.0f, 0.0f);
+	m_curPosit = Ogre::Vector3 (0.0f, 0.0f, 0.0f);
+	m_prevPosit = Ogre::Vector3 (0.0f, 0.0f, 0.0f);
+	m_curRotation = Ogre::Quaternion::IDENTITY;
+	m_prevRotation = Ogre::Quaternion::IDENTITY;
+	m_nodeRotation = Ogre::Quaternion::IDENTITY;
 
     m_body = NewtonCreateBody( m_world->getNewtonWorld(), col->getNewtonCollision() ); 
 
     NewtonBodySetUserData( m_body, this );
     NewtonBodySetDestructorCallback( m_body, newtonDestructor );
+	NewtonBodySetTransformCallback( m_body, newtonTransformCallback );
+
+	setLinearDamping(m_world->getDefaultLinearDamping() * (60.0f / m_world->getUpdateFPS()));
+	setAngularDamping(m_world->getDefaultAngularDamping() * (60.0f / m_world->getUpdateFPS()));
 }
 
 Body::~Body()
@@ -63,16 +78,36 @@ void _CDECL Body::newtonDestructor( const NewtonBody* body )
 // transform callback
 void _CDECL Body::newtonTransformCallback( const NewtonBody* body, const float* matrix, int threadIndex )
 {
-    Ogre::Quaternion orient;
-    Ogre::Vector3 pos;
+	Ogre::Real dot;
     OgreNewt::Body* me;
 
     me = (OgreNewt::Body*) NewtonBodyGetUserData( body );
+	
+	me->m_prevPosit = me->m_curPosit;
+	me->m_prevRotation = me->m_curRotation;
+	me->m_curPosit = Ogre::Vector3(matrix[12], matrix[13], matrix[14]);		
 
-    OgreNewt::Converters::MatrixToQuatPos( matrix, orient, pos );
+	// use the rotation from the body
+	NewtonBodyGetRotation (body, &me->m_curRotation.w);
 
-    if (me->m_transformcallback)
-        me->m_transformcallback( me, orient, pos, threadIndex );
+	dot = me->m_prevRotation.Dot(me->m_curRotation);
+
+	if (dot < 0.0f) {
+		me->m_prevRotation = -1.0f * me->m_prevRotation;
+	}
+
+	me->m_accumulatedGlobalForces.clear();
+
+	/*
+//	if (me->m_node) {
+//	if (m_nodeupdateneeded && !forceNodeUpdate )
+	if (!me->m_nodeupdateneeded) {
+		me->m_world->addBodyUpdateNodeRequest( threadIndex, me);
+
+		// me->m_transformcallback( me, threadIndex );
+	}
+//	}
+	*/
 }
 
     
@@ -91,28 +126,20 @@ void Body::standardForceCallback( OgreNewt::Body* me, float timestep, int thread
     Ogre::Vector3 inertia;
 
     me->getMassMatrix(mass, inertia);
-    Ogre::Vector3 force(0,-9.8,0);
-    force *= mass;
+    Ogre::Vector3 gravityAcceleration(0.0f, -9.8f, 0.0f);
+    Ogre::Vector3 gravityForce = gravityAcceleration * mass;
 
-    me->addForce( force );
+    me->addForce( gravityForce );
 
+	int nth = 0;
+
+	for (std::vector<std::pair<Ogre::Vector3, Ogre::Vector3> >::const_iterator it = me->m_accumulatedGlobalForces.begin(); it != me->m_accumulatedGlobalForces.end(); it++)
+	{
+		Ogre::LogManager::getSingleton().getDefaultLog()->logMessage("# [" + Ogre::StringConverter::toString(++nth) + "] force " + Ogre::StringConverter::toString(it->first) + " at " + Ogre::StringConverter::toString(it->second) + " to " + me->getOgreNode()->getName());
+
+		me->addGlobalForce(it->first, it->second);
+	}
 }
-
-
-void Body::standardTransformCallback( OgreNewt::Body* me, const Ogre::Quaternion& orient, const Ogre::Vector3& pos, int threadIndex )
-{
-    if(me->m_node != NULL)
-    {
-	me->m_node->setOrientation( orient );
-	me->m_node->setPosition( pos );
-    }
-    else
-    {
-	me->m_ogre_node->setOrientation( orient );
-	me->m_ogre_node->setPosition( pos );
-    }
-}
-
 
 
 int _CDECL Body::newtonBuoyancyCallback(const int collisionID, void *context, const float* globalSpaceMatrix, float* globalSpacePlane)
@@ -144,43 +171,35 @@ int _CDECL Body::newtonBuoyancyCallback(const int collisionID, void *context, co
 
 
 // attachToNode
-void Body::attachNode( Node* node )
-{
-    m_node = node;
-    if (m_body)
-    {
-        setCustomTransformCallback( &Body::standardTransformCallback );
-    }
-}
-
 void Body::attachNode( Ogre::Node* node )
 {
     m_ogre_node = node;
-    if (m_body)
-    {
-        setCustomTransformCallback( &Body::standardTransformCallback );
-    }
+	updateNode(1.0f);
 }
 
-void Body::setPositionOrientation( const Ogre::Vector3& pos, const Ogre::Quaternion& orient )
+void Body::attachNode( Node* node )
+{
+    m_node = node;
+	updateNode(1.0f);
+}
+
+void Body::setPositionOrientation( const Ogre::Vector3& pos, const Ogre::Quaternion& orient, int threadIndex)
 {
     if (m_body)
     {
         float matrix[16];
 
+		// reset the previews Position and rotation for this body
+		m_curPosit = pos;
+		m_prevPosit = pos;
+		m_curRotation = orient;
+		m_prevRotation = orient;
+
         OgreNewt::Converters::QuatPosToMatrix( orient, pos, &matrix[0] );
         NewtonBodySetMatrix( m_body, &matrix[0] );
 
-        if (m_node)
-        {
-            m_node->setOrientation( orient );
-            m_node->setPosition( pos );
-        }
-	else if(m_ogre_node)
-        {
-            m_ogre_node->setOrientation( orient );
-            m_ogre_node->setPosition( pos );
-        }
+		updateNode(1.0f);
+
     }
 }
 
@@ -212,6 +231,7 @@ void Body::setCustomForceAndTorqueCallback( ForceCallback callback )
 
 }
 
+/*
 // custom user force callback
 void Body::setCustomTransformCallback( TransformCallback callback )
 {
@@ -224,8 +244,8 @@ void Body::setCustomTransformCallback( TransformCallback callback )
     {
             m_transformcallback = callback;
     }
-
 }
+*/
 
 //set collision
 void Body::setCollision( const OgreNewt::CollisionPtr& col )
@@ -254,20 +274,52 @@ const OgreNewt::MaterialID* Body::getMaterialGroupID() const
 // get position and orientation
 void Body::getPositionOrientation( Ogre::Vector3& pos, Ogre::Quaternion& orient ) const
 {
-    float matrix[16];
+//  Ogre::Real matrix[16];
+//  NewtonBodyGetMatrix ( m_body, matrix );
+//	NewtonBodyGetRotation ( m_body, &orient.w );
+//	pos = Ogre::Vector3( matrix[12], matrix[13], matrix[14] );
 
-    NewtonBodyGetMatrix( m_body, matrix );
-    OgreNewt::Converters::MatrixToQuatPos( matrix, orient, pos );
+	pos = m_curPosit;
+	orient = m_curRotation;
+}
+
+Ogre::Vector3 Body::getPosition() const
+{
+	return m_curPosit;
+}
+
+
+Ogre::Quaternion Body::getOrientation() const
+{
+	return m_curRotation;
+}
+
+//! get the node position and orientation in form of an Ogre::Vector(position) and Ogre::Quaternion(orientation)
+void Body::getVisualPositionOrientation( Ogre::Vector3& pos, Ogre::Quaternion& orient ) const
+{
+	pos = m_nodePosit;
+	orient = m_nodeRotation;
+}
+
+Ogre::Vector3 Body::getVisualPosition() const
+{
+	return m_nodePosit;
+}
+
+
+Ogre::Quaternion Body::getVisualOrientation() const
+{
+	return m_nodeRotation;
 }
 
 Ogre::AxisAlignedBox Body::getAABB() const
 {
-    Ogre::AxisAlignedBox ret;
-    Ogre::Vector3 min, max;
-    NewtonBodyGetAABB( m_body, &min.x, &max.x );
-
-    ret.setExtents( min, max );
-    return ret;
+//	Ogre::AxisAlignedBox ret;
+//	Ogre::Vector3 min, max;
+//	NewtonBodyGetAABB( m_body, &min.x, &max.x );
+//	ret.setExtents( min, max );
+//	return ret;
+	return m_collision->getAABB(m_curRotation, m_curPosit);
 }
 
 void Body::getMassMatrix( Ogre::Real& mass, Ogre::Vector3& inertia ) const
@@ -365,11 +417,19 @@ void Body::addGlobalForce( const Ogre::Vector3& force, const Ogre::Vector3& pos 
     Ogre::Quaternion bodyorient;
     getPositionOrientation( bodypos, bodyorient );
 
-    Ogre::Vector3 topoint = pos - bodypos;
+    Ogre::Vector3 localMassCenter = getCenterOfMass();
+    Ogre::Vector3 globalMassCenter = bodypos + bodyorient * localMassCenter;
+
+    Ogre::Vector3 topoint = pos - globalMassCenter;
     Ogre::Vector3 torque = topoint.crossProduct( force );
 
     addForce( force );
     addTorque( torque );
+}
+
+void Body::addGlobalForceAccumulate( const Ogre::Vector3& force, const Ogre::Vector3& pos )
+{
+	m_accumulatedGlobalForces.push_back(std::pair<Ogre::Vector3,Ogre::Vector3>(force, pos));
 }
 
 void Body::addLocalForce( const Ogre::Vector3& force, const Ogre::Vector3& pos )
@@ -392,6 +452,36 @@ Body* Body::getNext() const
         return (Body*) NewtonBodyGetUserData(body);
 
     return NULL;
+}
+
+void Body::setNodeUpdateNotify (NodeUpdateNotifyCallback callback ) 
+{
+	m_nodeupdatenotifycallback = callback;
+}
+
+
+void Body::updateNode(Ogre::Real interpolatParam)
+{
+	Ogre::Vector3 velocity = m_curPosit - m_prevPosit;
+	
+	m_nodePosit = m_prevPosit + velocity * interpolatParam;
+	m_nodeRotation = Ogre::Quaternion::Slerp (interpolatParam, m_prevRotation, m_curRotation);
+
+	if (m_node) {
+		#ifndef WIN32
+			m_world->ogreCriticalSectionLock();
+		#endif
+		m_node->setPosition(m_nodePosit);
+		m_node->setOrientation(m_nodeRotation);
+
+		if (m_nodeupdatenotifycallback) {
+			m_nodeupdatenotifycallback (this);
+		}
+
+		#ifndef WIN32
+			m_world->ogreCriticalSectionUnlock();
+		#endif
+	}
 }
 
 

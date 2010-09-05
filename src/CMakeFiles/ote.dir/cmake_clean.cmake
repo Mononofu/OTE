@@ -4,6 +4,7 @@ FILE(REMOVE_RECURSE
   "CMakeFiles/ote.dir/game.cpp.o"
   "CMakeFiles/ote.dir/objectregistry.cpp.o"
   "CMakeFiles/ote.dir/resourcemanager.cpp.o"
+  "CMakeFiles/ote.dir/settingsmanager.cpp.o"
   "ote.pdb"
   "ote"
 )

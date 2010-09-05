@@ -20,6 +20,7 @@
 
 #include "graphics.h"
 #include "objectregistry.h"
+#include "settingsmanager.h"
 #include "FeedDataTypes.h"
 #include "boost/lexical_cast.hpp"
 #include <algorithm>
@@ -28,6 +29,7 @@
 #include "Ogre.h"
 #include "OgreConfigFile.h"
 #include "MyGUI.h"
+#include "MyGUI_OgrePlatform.h"
 #include "Caelum.h"
 #include <string>
 #include <boost/thread/thread.hpp>
@@ -36,21 +38,24 @@
 
 class GraphicsImpl : public Task, public Ogre::WindowEventListener, public DataProvider
 {
+
 	public:
 		GraphicsImpl();
 		~GraphicsImpl() { }
+
 		bool doStep();
 		void threadWillStart();
 		void threadWillStop();
-		
+
 		void handleKeyEvents(const DataContainer& data);
 		void handleMouseEvents(const DataContainer& data);
 		void handleObjectEvents(const DataContainer& data);
 		void handleTerrainEvents(const DataContainer& data);
 		void handleWorldEvents(const DataContainer& data);
 		void handleRemovedObjects(const DataContainer& data);
-		
+
 		DataContainer getData(const DataIdentifier& id);
+
 	private:
 		Ogre::Root* root;
 		MyGUI::Gui* gui;
@@ -79,15 +84,15 @@ class GraphicsImpl : public Task, public Ogre::WindowEventListener, public DataP
 		void updatePositions();
 		void setupGUI();
 		void guiCallback(MyGUI::WidgetPtr sender);
-		
+
 		void destroyScene();
-		
+
 		void windowResized(Ogre::RenderWindow* rw);
 		bool windowClosing(Ogre::RenderWindow* rw);
 
 		float moveScale;
 		Ogre::Vector3 movementVector;
-		
+
 		/** WorldGraph currently used for rendering **/
 		WorldGraph* frontWorld;
 		/** WorldGraph which is updated in the background **/
@@ -95,9 +100,9 @@ class GraphicsImpl : public Task, public Ogre::WindowEventListener, public DataP
 		/** used to synch exchange of frontWorld and backWorld **/
 		boost::mutex worldMutex;
 		boost::mutex modifyNodesMutex;
-		
-		
-		
+
+
+
 		std::map<int, Ogre::SceneNode*> nodes;
 		std::vector< boost::shared_ptr<ObjectToCreate> > nodesToAdd;
 		std::vector<int> nodesToRemove;
@@ -105,11 +110,27 @@ class GraphicsImpl : public Task, public Ogre::WindowEventListener, public DataP
 		bool newWorld;
 };
 
-Graphics::Graphics() : impl( new GraphicsImpl() ) { }
-bool Graphics::doStep() { return impl->step(); }
-void Graphics::threadWillStart() { impl->threadWillStart(); }
-void Graphics::threadWillStop() { impl->threadWillStop(); }
-DataContainer Graphics::getData(const DataIdentifier& id) { return impl->getData(id); }
+Graphics::Graphics() : impl(new GraphicsImpl()) { }
+
+bool Graphics::doStep()
+{
+	return impl->step();
+}
+
+void Graphics::threadWillStart()
+{
+	impl->threadWillStart();
+}
+
+void Graphics::threadWillStop()
+{
+	impl->threadWillStop();
+}
+
+DataContainer Graphics::getData(const DataIdentifier& id)
+{
+	return impl->getData(id);
+}
 
 GraphicsImpl::GraphicsImpl() : movementVector(0, 0, 0), frontWorld(new WorldGraph), backWorld(new WorldGraph), newWorld(false)
 {
@@ -117,75 +138,77 @@ GraphicsImpl::GraphicsImpl() : movementVector(0, 0, 0), frontWorld(new WorldGrap
 
 bool GraphicsImpl::doStep()
 {
-	if(newWorld)
-	{
+	if (newWorld) {
 		boost::mutex::scoped_lock lock(worldMutex);
 		std::swap(frontWorld, backWorld);
 		newWorld = false;
 	}
+
 	gui->injectFrameEntered(timeSinceLastFrame());
+
 	moveScale = timeSinceLastFrame() * 100;
 	camera->moveRelative(movementVector * moveScale);
 	updatePositions();
 	Ogre::WindowEventUtilities::messagePump();
-	//caelumSystem->notifyCameraChanged (camera);
+	caelumSystem->notifyCameraChanged(camera);
 	return root->renderOneFrame();
 }
 
 void GraphicsImpl::threadWillStart()
 {
-	subscribeToFeed("input_keyboard", boost::bind( &GraphicsImpl::handleKeyEvents, this, _1));
-	subscribeToFeed("input_mouse", boost::bind( &GraphicsImpl::handleMouseEvents, this, _1));
-	subscribeToFeed("world_dynamic", boost::bind( &GraphicsImpl::handleWorldEvents, this, _1));
-	subscribeToFeed("create_object", boost::bind( &GraphicsImpl::handleObjectEvents, this, _1));
-	subscribeToFeed("create_terrain", boost::bind( &GraphicsImpl::handleTerrainEvents, this, _1));
-	subscribeToFeed("world_removed", boost::bind( &GraphicsImpl::handleRemovedObjects, this, _1));
-	
+	subscribeToFeed("input_keyboard", boost::bind(&GraphicsImpl::handleKeyEvents, this, _1));
+	subscribeToFeed("input_mouse", boost::bind(&GraphicsImpl::handleMouseEvents, this, _1));
+	subscribeToFeed("world_dynamic", boost::bind(&GraphicsImpl::handleWorldEvents, this, _1));
+	subscribeToFeed("create_object", boost::bind(&GraphicsImpl::handleObjectEvents, this, _1));
+	subscribeToFeed("create_terrain", boost::bind(&GraphicsImpl::handleTerrainEvents, this, _1));
+	subscribeToFeed("world_removed", boost::bind(&GraphicsImpl::handleRemovedObjects, this, _1));
+
 	Dout <<  "Creating root";
-	root = new Ogre::Root ( "", "", resourcePath + "ogre.log" );
-	
+	root = new Ogre::Root("", "", resourcePath + "ogre.log");
+
 	Dout << "Loading plugins" ;
 	loadPlugins();
-	
+
 	Dout << "Setting Ressources" ;
 	setupResources();
-	
+
 	Dout << "Configuring root" ;
-	if(!configure())
-	{
+
+	if (!configure()) {
 		Derr << "Failed to configure root";
 	}
 
-	
+
 	Dout << "Create Scenemanager" ;
+
 	chooseSceneManager();
 
 	Dout << "Create Camera" ;
 	createCamera();
-	
+
 	Dout << "Create Viewport" ;
-	createViewports();	
-	
+	createViewports();
+
 	Dout << "Set default MipMap lvl" ;
 	Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
 
 	Dout << "Create resource listeners" ;
 	createResourceListener();
-	
+
 	Dout << "Load resources" ;
 	loadResources();
-	
+
 	Dout << "Setup GUI";
 	setupGUI();
 
 	Dout << "Create Framelistener" ;
 	createFrameListener();
-	
+
 	Dout << "Create Basic Scene" ;
 	createScene();
 
 	root->clearEventTimes();
-	
+
 	InformationManager::Instance()->offerData("window", this);
 }
 
@@ -197,51 +220,52 @@ void GraphicsImpl::threadWillStop()
 	delete listener;
 	//Ogre::WindowEventUtilities::removeWindowEventListener(window, this);
 	//windowClosed(window);
-	delete root;
-	//boost::this_thread::sleep(boost::posix_time::milliseconds(100));		// Wait 1/100 s
+
+	root->shutdown();
+	//delete root;
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));		// Wait 1/100 s
 }
 
 void GraphicsImpl::handleKeyEvents(const DataContainer& data)
 {
 	InputKeyboardEvent ev = boost::any_cast<InputKeyboardEvent>(data.data);
-				
-	if(ev.action == BUTTON_PRESSED)
-	{
-		gui->injectKeyPress( (MyGUI::KeyCode::Enum) ev.type );
-		if(ev.type == KEY_W)
-		{
+
+	if (ev.action == BUTTON_PRESSED) {
+		gui->injectKeyPress((MyGUI::KeyCode::Enum) ev.type);
+
+		if (ev.type == KEY_W) {
 			movementVector.z = -1;
 		}
-		else if(ev.type == KEY_S)
-		{
+
+		else if (ev.type == KEY_S) {
 			movementVector.z = 1;
 		}
-		else if(ev.type == KEY_A)
-		{
+
+		else if (ev.type == KEY_A) {
 			movementVector.x = -1;
 		}
-		else if(ev.type == KEY_D)
-		{
+
+		else if (ev.type == KEY_D) {
 			movementVector.x = 1;
 		}
 	}
-	else
-	{
-		gui->injectKeyRelease( (MyGUI::KeyCode::Enum) ev.type );
-		if(ev.type == KEY_W)
-		{
+
+	else {
+		gui->injectKeyRelease((MyGUI::KeyCode::Enum) ev.type);
+
+		if (ev.type == KEY_W) {
 			movementVector.z = 0;
 		}
-		else if(ev.type == KEY_S)
-		{
+
+		else if (ev.type == KEY_S) {
 			movementVector.z = 0;
 		}
-		else if(ev.type == KEY_A)
-		{
+
+		else if (ev.type == KEY_A) {
 			movementVector.x = 0;
 		}
-		else if(ev.type == KEY_D)
-		{
+
+		else if (ev.type == KEY_D) {
 			movementVector.x = 0;
 		}
 	}
@@ -251,68 +275,59 @@ void GraphicsImpl::handleMouseEvents(const DataContainer& data)
 {
 	InputMouseEvent ev = boost::any_cast<InputMouseEvent>(data.data);
 	static bool mouseButtonPressed = false;
-		
-	if(ev.action == BUTTON_SAME)
-	{	
-		gui->injectMouseMove(ev.mouseX, ev.mouseY, 0);
-			
-		if(mouseButtonPressed)
-		{
-			camera->yaw(Ogre::Degree(-ev.mouseDeltaX * 0.13));
-			camera->pitch(Ogre::Degree(-ev.mouseDeltaY * 0.13));
-		}
-			
-	}
-	else
-	{
+
+	gui->injectMouseMove(ev.mouseX, ev.mouseY, 0);
+	camera->yaw(Ogre::Degree(-ev.mouseDeltaX * 0.13));
+	camera->pitch(Ogre::Degree(-ev.mouseDeltaY * 0.13));
+
+
+	
 		MyGUI::MouseButton id;
-			
-		if(ev.type == BUTTON_MOUSE_LEFT)
-		{
+
+		if (ev.type == BUTTON_MOUSE_LEFT) {
 			id = MyGUI::MouseButton::Left;
 		}
-		else if(ev.type == BUTTON_MOUSE_RIGHT)
-		{
+
+		else if (ev.type == BUTTON_MOUSE_RIGHT) {
 			id = MyGUI::MouseButton::Right;
 		}
-		else
-		{
+
+		else {
 			id = MyGUI::MouseButton::Middle;
 		}
-		
-		
-		if(ev.action == BUTTON_PRESSED)
-		{
+
+
+		if (ev.action == BUTTON_PRESSED) {
 			mouseButtonPressed = true;
 			gui->injectMousePress(ev.mouseX, ev.mouseY, id);
 		}
-		else
-		{
+
+		else {
 			mouseButtonPressed = false;
 			gui->injectMouseRelease(ev.mouseX, ev.mouseY, id);
 		}
-	}	
+	
 }
 
 void GraphicsImpl::handleObjectEvents(const DataContainer& data)
 {
 	boost::shared_ptr<ObjectToCreate> node = boost::any_cast< boost::shared_ptr<ObjectToCreate> >(data.data);
 	boost::mutex::scoped_lock lock(modifyNodesMutex);
-	nodesToAdd.push_back( node );
+	nodesToAdd.push_back(node);
 }
 
 void GraphicsImpl::handleRemovedObjects(const DataContainer& data)
 {
 	int node = boost::any_cast<int>(data.data);
 	boost::mutex::scoped_lock lock(modifyNodesMutex);
-	nodesToRemove.push_back( node );
+	nodesToRemove.push_back(node);
 }
 
 void GraphicsImpl::handleTerrainEvents(const DataContainer& data)
 {
 	Terrain object = boost::any_cast<Terrain>(data.data);
 	boost::mutex::scoped_lock lock(modifyNodesMutex);
-	terrainToCreate.push_back( object );
+	terrainToCreate.push_back(object);
 }
 
 void GraphicsImpl::handleWorldEvents(const DataContainer& data)
@@ -325,8 +340,7 @@ void GraphicsImpl::handleWorldEvents(const DataContainer& data)
 
 DataContainer GraphicsImpl::getData(const DataIdentifier& id)
 {
-	if(id == "window.handle")
-	{
+	if (id == "window.handle") {
 		std::ostringstream windowHndStr;
 		size_t windowHnd = 0;
 		window->getCustomAttribute("WINDOW", &windowHnd);
@@ -334,7 +348,7 @@ DataContainer GraphicsImpl::getData(const DataIdentifier& id)
 
 		return DataContainer(windowHndStr.str());
 	}
-	
+
 	return DataContainer();
 }
 
@@ -342,7 +356,7 @@ void GraphicsImpl::loadPlugins()
 {
 	root->loadPlugin("./RenderSystem_GL");
 	root->loadPlugin("./Plugin_OctreeSceneManager");
-	root->loadPlugin("./Plugin_ParticleFX" );
+	root->loadPlugin("./Plugin_ParticleFX");
 }
 
 void GraphicsImpl::setupResources()
@@ -351,28 +365,28 @@ void GraphicsImpl::setupResources()
 	Ogre::ConfigFile cf;
 	cf.load(resourcePath + "resources.cfg");
 
-        // Go through all sections & settings in the file
+	// Go through all sections & settings in the file
 	Ogre::ConfigFile::SectionIterator seci = cf.getSectionIterator();
 
 	Ogre::String secName, typeName, archName;
-	while (seci.hasMoreElements())
-	{
+
+	while (seci.hasMoreElements()) {
 		secName = seci.peekNextKey();
 		Ogre::ConfigFile::SettingsMultiMap *settings = seci.getNext();
 		Ogre::ConfigFile::SettingsMultiMap::iterator i;
-		for (i = settings->begin(); i != settings->end(); ++i)
-		{
+
+		for (i = settings->begin(); i != settings->end(); ++i) {
 			typeName = i->first;
 			archName = i->second;
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-                // OS X does not set the working directory relative to the app,
-                // In order to make things portable on OS X we need to provide
-                // the loading with it's own bundle path location
+			// OS X does not set the working directory relative to the app,
+			// In order to make things portable on OS X we need to provide
+			// the loading with it's own bundle path location
 			Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-					Ogre::String(macBundlePath() + "/" + archName), typeName, secName);
+			 Ogre::String(macBundlePath() + "/" + archName), typeName, secName);
 #else
 			Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-					archName, typeName, secName);
+			 archName, typeName, secName);
 #endif
 		}
 	}
@@ -381,31 +395,31 @@ void GraphicsImpl::setupResources()
 bool GraphicsImpl::configure()
 {
 	Dout <<"Setting Rendering Subsystem" ;
-	
-	Ogre::RenderSystemList renderers = root->getAvailableRenderers(); 
-	if (renderers.empty()) 
-	{
+
+	Ogre::RenderSystemList renderers = root->getAvailableRenderers();
+
+	if (renderers.empty()) {
 		Dout <<"No rendering system available" ;
 		return false;
 	}
-	 
+
 	root->setRenderSystem(renderers.front());
-	
+
 	Dout <<"Init Root" ;
-	
+
 	root->initialise(false);
-	
+
 	Dout <<"Create window" ;
-	
-	window = root->createRenderWindow ( "Manual Ogre Window", 1024, 768, false, 0 );                   // use defaults for all other values
-	
-	
+
+	window = root->createRenderWindow("Manual Ogre Window", boost::any_cast<int>(SettingsManager::Instance().getSetting("x_res").data), boost::any_cast<int>(SettingsManager::Instance().getSetting("y_res").data), false, 0);                      // use defaults for all other values
+
+
 	return true;
 }
 
 void GraphicsImpl::chooseSceneManager()
 {
-	sceneMgr = root->createSceneManager("TerrainSceneManager");	
+	sceneMgr = root->createSceneManager("TerrainSceneManager");
 }
 
 void GraphicsImpl::createCamera()
@@ -413,7 +427,7 @@ void GraphicsImpl::createCamera()
 	camera = sceneMgr->createCamera("MainCamera");
 	// Position it at 500 in Z direction
 	camera->setPosition(Ogre::Vector3(0, 50, 100));
-        // Look back along -Z
+	// Look back along -Z
 	camera->lookAt(Ogre::Vector3(0, -10, 0));
 	camera->setNearClipDistance(5);
 	camera->setFarClipDistance(0);
@@ -421,7 +435,7 @@ void GraphicsImpl::createCamera()
 
 void GraphicsImpl::createViewports()
 {
-	viewPort = window->addViewport( camera );
+	viewPort = window->addViewport(camera);
 	viewPort->setBackgroundColour(Ogre::ColourValue(0,0,0));
 	camera->setAspectRatio(Ogre::Real(viewPort->getActualWidth()) / Ogre::Real(viewPort->getActualHeight()));
 }
@@ -440,12 +454,12 @@ void GraphicsImpl::createFrameListener()
 	listener = new MyFrameListener(window, camera, sceneMgr);
 	listener->showDebugOverlay(true);
 	root->addFrameListener(listener);
-	
+
 	Ogre::WindowEventUtilities::addWindowEventListener(window, this);
 
 	//newtonListener = new OgreNewt::BasicFrameListener( window, sceneMgr, world, 120 );
 	//root->addFrameListener(newtonListener);
-	
+
 	//caelumListener = new CaelumFrameListener( window, camera );
 	//root->addFrameListener(caelumListener);
 }
@@ -458,12 +472,101 @@ void GraphicsImpl::createScene()
 	// Create a light
 	Ogre::Light* l = sceneMgr->createLight("MainLight");
 	l->setPosition(20,80,50);
-	
-	caelumSystem = new Caelum::CaelumSystem (root, sceneMgr, Caelum::CaelumSystem::CAELUM_COMPONENTS_DEFAULT);
-	caelumSystem->getUniversalClock ()->setTimeScale (512);
-	caelumSystem->setManageSceneFog(false);
-	window->addListener( caelumSystem );
-	root->addFrameListener ( caelumSystem );
+
+	caelumSystem = new Caelum::CaelumSystem(root, sceneMgr, Caelum::CaelumSystem::CAELUM_COMPONENTS_NONE);
+
+	try {
+		caelumSystem->setSkyDome(new Caelum::SkyDome(sceneMgr, caelumSystem->getCaelumCameraNode()));
+	} catch (Caelum::UnsupportedException& ex) {
+		Dout << ex.getFullDescription();
+	}
+
+	try {
+		caelumSystem->setSun(new Caelum::SphereSun(sceneMgr, caelumSystem->getCaelumCameraNode()));
+	} catch (Caelum::UnsupportedException& ex) {
+		Dout << ex.getFullDescription();
+	}
+
+	try {
+		caelumSystem->setMoon(new Caelum::Moon(sceneMgr, caelumSystem->getCaelumCameraNode()));
+	} catch (Caelum::UnsupportedException& ex) {
+		Dout << ex.getFullDescription();
+	}
+
+	try {
+		caelumSystem->setCloudSystem(new Caelum::CloudSystem(sceneMgr, caelumSystem->getCaelumGroundNode()));
+	} catch (Caelum::UnsupportedException& ex) {
+		Dout << ex.getFullDescription();
+	}
+
+	try {
+		caelumSystem->setPointStarfield(new Caelum::PointStarfield(sceneMgr, caelumSystem->getCaelumCameraNode()));
+	} catch (Caelum::UnsupportedException& ex) {
+		Dout << ex.getFullDescription();
+	}
+
+	// Register caelum.
+	// Don't make it a frame listener; update it by hand.
+	//Root::getSingletonPtr ()->addFrameListener (caelumSystem.get ());
+	caelumSystem->attachViewport(viewPort);
+
+	try {
+		caelumSystem->setPrecipitationController(new Caelum::PrecipitationController(sceneMgr));
+	} catch (Caelum::UnsupportedException& ex) {
+		Dout << ex.getFullDescription();
+	}
+
+	caelumSystem->setSceneFogDensityMultiplier(0.0015);
+
+	caelumSystem->setManageAmbientLight(true);
+	caelumSystem->setMinimumAmbientLight(Ogre::ColourValue(0.1, 0.1, 0.1));
+
+	// Setup sun options
+
+	if (caelumSystem->getSun()) {
+		// Make the sun very obvious:
+		//caelumSystem->getSun ()->setDiffuseMultiplier (Ogre::ColourValue (1, 10, 1));
+
+		caelumSystem->getSun()->setAutoDisableThreshold(0.05);
+		caelumSystem->getSun()->setAutoDisable(false);
+	}
+
+	if (caelumSystem->getMoon()) {
+		// Make the moon very obvious:
+		//caelumSystem->getMoon ()->setDiffuseMultiplier (Ogre::ColourValue (1, 1, 10));
+
+		caelumSystem->getMoon()->setAutoDisableThreshold(0.05);
+		caelumSystem->getMoon()->setAutoDisable(false);
+	}
+
+	if (caelumSystem->getCloudSystem()) {
+		try {
+			caelumSystem->getCloudSystem()->createLayerAtHeight(2000);
+			caelumSystem->getCloudSystem()->createLayerAtHeight(5000);
+			caelumSystem->getCloudSystem()->getLayer(0)->setCloudSpeed(Ogre::Vector2(0.000005, -0.000009));
+			caelumSystem->getCloudSystem()->getLayer(1)->setCloudSpeed(Ogre::Vector2(0.0000045, -0.0000085));
+		}
+
+		catch (Caelum::UnsupportedException& ex) {
+			Dout << ex.getFullDescription();
+		}
+	}
+
+	if (caelumSystem->getPrecipitationController()) {
+		caelumSystem->getPrecipitationController()->setIntensity(0);
+	}
+
+	// Set time acceleration.
+	//caelumSystem->getUniversalClock ()->setTimeScale (0);
+
+	// Sunrise with visible moon.
+	caelumSystem->getUniversalClock()->setGregorianDateTime(2007, 4, 9, 9, 33, 0);
+
+	caelumSystem->getUniversalClock()->setTimeScale(1024);
+
+	window->addListener(caelumSystem);
+
+	root->addFrameListener(caelumSystem);
 }
 
 void GraphicsImpl::addNode(const boost::shared_ptr<ObjectToCreate>& object)
@@ -484,11 +587,13 @@ void GraphicsImpl::addNode(const boost::shared_ptr<ObjectToCreate>& object)
 void GraphicsImpl::removeNode(int ID)
 {
 	Ogre::SceneNode* node = nodes[ID];
-	if(node->getParent() != NULL)
-	{
+
+	if (node->getParent() != NULL) {
 		node->getParent()->removeChild(node);
 	}
+
 	node->removeAndDestroyAllChildren();
+
 	delete node;
 	nodes.erase(ID);
 }
@@ -505,10 +610,10 @@ void GraphicsImpl::windowResized(Ogre::RenderWindow* rw)
 bool GraphicsImpl::windowClosing(Ogre::RenderWindow* rw)
 {
 	//Only close for window that created OIS (the main window in these demos)
-	if( rw == window )
-	{
+	if (rw == window) {
 		InformationManager::Instance()->postDataToFeed("gui_event", DataContainer(EXIT_BUTTON));
 	}
+
 	return true;
 }
 
@@ -516,20 +621,20 @@ void GraphicsImpl::updatePositions()
 {
 	{
 		boost::mutex::scoped_lock lock(modifyNodesMutex);
-		while (!nodesToAdd.empty())
-		{
+
+		while (!nodesToAdd.empty()) {
 			addNode(nodesToAdd.back());
 			nodesToAdd.pop_back();
 		}
-		while (!nodesToRemove.empty())
-		{
+
+		while (!nodesToRemove.empty()) {
 			removeNode(nodesToRemove.back());
 			nodesToRemove.pop_back();
 		}
-		while( !terrainToCreate.empty())
-		{
+
+		while (!terrainToCreate.empty()) {
 			Terrain terrain = terrainToCreate.back();
-			
+
 			Ogre::Entity* ent;
 			Ogre::SceneNode* node;
 			Dout << "Creating terrain with specification: " + terrain.specification;
@@ -538,54 +643,55 @@ void GraphicsImpl::updatePositions()
 			node = sceneMgr->getRootSceneNode()->createChildSceneNode();
 			node->attachObject(ent);
 			node->setPosition(terrain.node.pos);
-			ent->setMaterialName( "Simple/BeachStones" );
+			ent->setMaterialName("Simple/BeachStones");
 			node->setOrientation(terrain.node.orient);
 			node->setScale(terrain.scale);
 			nodes[terrain.node.ID] = node;
-			
+
 			terrainToCreate.pop_back();
-		
+
 		}
 	}
-	
-	if(!frontWorld->nodes.empty())
-	{
-		for(std::vector< OgreNewt::Node* >::iterator iter = frontWorld->nodes.begin(); iter != frontWorld->nodes.end(); ++iter)
-		{
-			nodes[(*iter)->ID]->setOrientation( (*iter)->orient );
-			nodes[(*iter)->ID]->setPosition( (*iter)->pos );
+
+	if (!frontWorld->nodes.empty()) {
+		for (std::vector< OgreNewt::Node* >::iterator iter = frontWorld->nodes.begin(); iter != frontWorld->nodes.end(); ++iter) {
+			nodes[(*iter)->ID]->setOrientation((*iter)->orient);
+			nodes[(*iter)->ID]->setPosition((*iter)->pos);
 		}
 	}
 }
 
 void GraphicsImpl::setupGUI()
 {
+	MyGUI::Gui * mGUI;
+	MyGUI::OgrePlatform* platform = new MyGUI::OgrePlatform();
+	platform->initialise(window, sceneMgr);
 	gui = new MyGUI::Gui();
-	gui->initialise(window);
-	
+	gui->initialise();
+
 	mainGuiWidget = gui->createWidgetReal<MyGUI::Widget>("Default", 0.0, 0.0, 1.0, 1.0, MyGUI::Align::Default, "Main");
-	
+
 	MyGUI::ButtonPtr button = mainGuiWidget->createWidgetReal<MyGUI::Button>("Button", 0.005, 0.008, 0.156, 0.05, MyGUI::Align::Default, "exit");
 	button->setCaption("exit");
-  // set callback
+	// set callback
 	button->eventMouseButtonClick = MyGUI::newDelegate(this, &GraphicsImpl::guiCallback);
-	
+
 	button = mainGuiWidget->createWidgetReal<MyGUI::Button>("Button", 0.182, 0.008, 0.156, 0.05, MyGUI::Align::Default, "do");
 	button->setCaption("do something");
-  // set callback
+	// set callback
 	button->eventMouseButtonClick = MyGUI::newDelegate(this, &GraphicsImpl::guiCallback);
 }
 
 void GraphicsImpl::guiCallback(MyGUI::WidgetPtr sender)
 {
 	std::string name = sender->getName();
-	if(name == "do")
-	{
+
+	if (name == "do") {
 		InformationManager::Instance()->postDataToFeed("gui_event", DataContainer(DO_BUTTON));
 	}
-	if(name == "exit")
-	{
+
+	if (name == "exit") {
 		InformationManager::Instance()->postDataToFeed("gui_event", DataContainer(EXIT_BUTTON));
 	}
-	
+
 }

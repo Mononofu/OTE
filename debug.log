@@ -1,0 +1,36 @@
+2010-Aug-26 21:23:56.410693 <normal> Retrying to fetch data window.handle in 0x1ab9840
+2010-Aug-26 21:23:56.439318 <normal> Creating root in 0x1ab94a0
+2010-Aug-26 21:23:56.488804 <normal> Loading plugins in 0x1ab94a0
+2010-Aug-26 21:23:56.761024 <normal> Setting Ressources in 0x1ab94a0
+2010-Aug-26 21:23:56.811520 <normal> Configuring root in 0x1ab94a0
+2010-Aug-26 21:23:56.811674 <normal> Setting Rendering Subsystem in 0x1ab94a0
+2010-Aug-26 21:23:56.811899 <normal> Init Root in 0x1ab94a0
+2010-Aug-26 21:23:56.812540 <normal> Create window in 0x1ab94a0
+2010-Aug-26 21:23:57.411899 <normal> Retrying to fetch data window.handle in 0x1ab9840
+2010-Aug-26 21:23:57.413444 <normal> Create Scenemanager in 0x1ab94a0
+2010-Aug-26 21:23:57.434420 <normal> Create Camera in 0x1ab94a0
+2010-Aug-26 21:23:57.434560 <normal> Create Viewport in 0x1ab94a0
+2010-Aug-26 21:23:57.434650 <normal> Set default MipMap lvl in 0x1ab94a0
+2010-Aug-26 21:23:57.434706 <normal> Create resource listeners in 0x1ab94a0
+2010-Aug-26 21:23:57.434759 <normal> Load resources in 0x1ab94a0
+2010-Aug-26 21:23:57.599503 <normal> Setup GUI in 0x1ab94a0
+2010-Aug-26 21:23:57.679263 <normal> Create Framelistener in 0x1ab94a0
+2010-Aug-26 21:23:57.679608 <normal> Create Basic Scene in 0x1ab94a0
+2010-Aug-26 21:23:57.705598 <normal> OGRE EXCEPTION(-1:UnsupportedException): Can't load material "Caelum/PhaseMoon": Pass 0: Fragment program Caelum/PhaseMoonFP cannot be used - not supported.
+ in Caelum at main/src/InternalUtilities.cpp (line 101) in 0x1ab94a0
+2010-Aug-26 21:23:57.705858 <normal> OGRE EXCEPTION(-1:UnsupportedException): Can't load material "Caelum/StarPoint": Pass 0: Vertex program Caelum/StarPointVP cannot be used - not supported.
+ in Caelum at main/src/InternalUtilities.cpp (line 101) in 0x1ab94a0
+2010-Aug-26 21:23:57.706110 <normal> OGRE EXCEPTION(-1:UnsupportedException): Can't load compositor "Caelum/PrecipitationCompositor" in Caelum at main/src/InternalUtilities.cpp (line 121) in 0x1ab94a0
+2010-Aug-26 21:23:57.706379 <normal> OGRE EXCEPTION(-1:UnsupportedException): Can't load material "CaelumLayeredClouds": Pass 0: Vertex program CaelumLayeredCloudsVP cannot be used - not supported.
+ in Caelum at main/src/InternalUtilities.cpp (line 101) in 0x1ab94a0
+2010-Aug-26 21:24:01.608404 <normal> My terrain: playground.mesh in 0x1ab92f0
+2010-Aug-26 21:24:01.759170 <normal> Creating terrain with specification: playground.mesh in 0x1ab94a0
+2010-Aug-26 21:24:12.475719 <normal>  received shutdown event in 0x1ab9160
+2010-Aug-26 21:24:12.478629 <normal>  received shutdown event in 0x1ab9670
+2010-Aug-26 21:24:12.484459 <normal>  received shutdown event in 0x1ab9840
+2010-Aug-26 21:24:12.484877 <normal>  received shutdown event in 0x1ab94a0
+2010-Aug-26 21:24:12.484861 <normal>  received shutdown event in 0x1ab92f0
+2010-Aug-26 21:24:12.561276 <normal> Time spent working: 16.0853s or 99.7591% in 0x1ab9670
+2010-Aug-26 21:24:12.561440 <normal> Time spent on overhead: 0.038846s or 0.240919% in 0x1ab9670
+2010-Aug-26 21:24:12.561502 <normal> Total runtime: 16.1241 in 0x1ab9670
+2010-Aug-26 21:24:12.561548 <normal> FPS: 70.7016 in 0x1ab9670

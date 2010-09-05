@@ -12,7 +12,7 @@
 #include "game.h"
 #include "input.h"
 
-int main ( int argc, char *argv[] )
+int main(int argc, char *argv[])
 {
 	initDebug();
 
@@ -21,20 +21,20 @@ int main ( int argc, char *argv[] )
 	Physics physics;
 	Input input;
 	Game game;
-	
-#ifdef DEBUG_BUILD
+
+#ifdef SINGLE_THREADED
 	myManager.setThreadingMode(THREADING_SEQUENCIAL);
 #endif
-	
-	myManager.registerTask ( &game );
-	myManager.registerTask ( &graphics );
-	myManager.registerTask ( &physics );
-	myManager.registerTask ( &input );
-	
+
+	myManager.registerTask(&game);
+	myManager.registerTask(&graphics);
+	myManager.registerTask(&physics);
+	myManager.registerTask(&input);
+
 	myManager.run();
-	
+
 	myManager.waitForThreadsToFinish();
-	
+
 
 	return EXIT_SUCCESS;
 }

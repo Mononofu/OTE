@@ -1,6 +1,13 @@
-#include "OgreNewt_BasicJoints.h"
+#include "OgreNewt_stdafx.h"
 #include "OgreNewt_World.h"
 #include "OgreNewt_Body.h"
+#include "OgreNewt_BasicJoints.h"
+
+#include "CustomHinge.h"
+#include "CustomSlider.h"
+#include "CustomBallAndSocket.h"
+#include "CustomUpVector.h"
+#include "CustomKinematicController.h"
 
 #ifdef __APPLE__
 #   include <Ogre/OgreLogManager.h>
@@ -10,27 +17,24 @@
 #   include <OgreStringConverter.h>
 #endif
 
+
+
+
 namespace OgreNewt
 {
 
-namespace BasicJoints
+
+BallAndSocket::BallAndSocket( const OgreNewt::Body* child, const OgreNewt::Body* parent, const Ogre::Vector3& pos ) : Joint()
 {
-    
-BallAndSocket::BallAndSocket( const World* world, const OgreNewt::Body* child, const OgreNewt::Body* parent, const Ogre::Vector3& pos ) : Joint()
-{
-    m_world = world;
+	NewtonCustomJoint* suppportJoint;
 
-    if (parent)
-        m_joint = NewtonConstraintCreateBall( world->getNewtonWorld(), &pos.x, child->getNewtonBody(), parent->getNewtonBody() );
-    else
-        m_joint = NewtonConstraintCreateBall( world->getNewtonWorld(), &pos.x, child->getNewtonBody(), NULL );
+	// make the joint matrix 
+	dMatrix pinsAndPivoFrame (GetIdentityMatrix());
+	pinsAndPivoFrame.m_posit = dVector (pos.x, pos.y, pos.z, 1.0f);
 
-
-    // all constructors inherited from Joint MUST call these 2 functions to make the joint function properly.
-    NewtonJointSetUserData( m_joint, this );
-    NewtonJointSetDestructor( m_joint, destructor );
-
-    m_callback = NULL;
+	// crate a Newton Custom joint and set it at the support joint	
+	suppportJoint = new CustomBallAndSocket(pinsAndPivoFrame, child->getNewtonBody(), parent ? parent->getNewtonBody() : NULL);
+	SetSupportJoint(suppportJoint);
 }
 
 BallAndSocket::~BallAndSocket()
@@ -38,68 +42,31 @@ BallAndSocket::~BallAndSocket()
     // nothing, the ~Joint() function will take care of us.
 }
 
-Ogre::Vector3 BallAndSocket::getJointAngle() const
-{
-    Ogre::Vector3 ret;
-
-    NewtonBallGetJointAngle( m_joint, &ret.x );
-
-    return ret;
-}
-
-
-Ogre::Vector3 BallAndSocket::getJointOmega() const
-{
-    Ogre::Vector3 ret;
-
-    NewtonBallGetJointOmega( m_joint, &ret.x );
-
-    return ret;
-}
-
-
-Ogre::Vector3 BallAndSocket::getJointForce() const
-{
-    Ogre::Vector3 ret;
-
-    NewtonBallGetJointForce( m_joint, &ret.x );
-
-    return ret;
-}
-
-
-void _CDECL BallAndSocket::newtonBallCallback(const NewtonJoint* ball, float timestep)
-{
-    BallAndSocket* me = (BallAndSocket*)NewtonJointGetUserData(ball);
-    if( me->m_callback != NULL )
-        ( *me->m_callback )(me, timestep);
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
-
-
-Hinge::Hinge( const World* world, const OgreNewt::Body* child, const OgreNewt::Body* parent, const Ogre::Vector3& pos, const Ogre::Vector3& pin ) : Joint()
+Hinge::Hinge (const OgreNewt::Body* child, const OgreNewt::Body* parent, const Ogre::Vector3& pos, const Ogre::Vector3& pin ) : Joint()
 {
-    m_world = world;
+	NewtonCustomJoint* suppportJoint;
 
-    if (parent)
-    {
-        m_joint = NewtonConstraintCreateHinge( world->getNewtonWorld(), &pos.x, &pin.x,
-                                                child->getNewtonBody(), parent->getNewtonBody() );
-    }
-    else
-    {
-        m_joint = NewtonConstraintCreateHinge( world->getNewtonWorld(), &pos.x, &pin.x,
-                                                child->getNewtonBody(), NULL );
-    }
+	// make the joint matrix 
+	dVector dir (pin.x, pin.y, pin.z, 0.0f);
+	dMatrix pinsAndPivoFrame (dgGrammSchmidt(dir));
+	pinsAndPivoFrame.m_posit = dVector (pos.x, pos.y, pos.z, 1.0f);
 
-    NewtonJointSetUserData( m_joint, this );
-    NewtonJointSetDestructor( m_joint, destructor );
-    NewtonHingeSetUserCallback( m_joint, newtonCallback );
+	// crate a Newton Custom joint and set it at the support joint	
+	suppportJoint = new CustomHinge (pinsAndPivoFrame, child->getNewtonBody(), parent ? parent->getNewtonBody() : NULL);
+	SetSupportJoint(suppportJoint);
 
-    m_callback = NULL;
+	m_constraintType = CONSTRAINT_NONE;
+	m_lastConstraintType = CONSTRAINT_NONE;
+	m_desiredOmega = 0.0f;
+	m_desiredAngle = 0.0f;
+	m_motorStrength = 0.5f;
+	m_motorTorque = 0.0f;
+	m_motorMinFriction = 0.0f;
+	m_motorMaxFriction = 0.0f;
+	m_brakeMaxForce = 0.0f;
 }
 
 Hinge::~Hinge()
@@ -107,72 +74,135 @@ Hinge::~Hinge()
 }
 
 
-Ogre::Vector3 Hinge::getJointForce() const
+void Hinge::enableLimits(bool state)
 {
-    Ogre::Vector3 ret;
-
-    NewtonHingeGetJointForce( m_joint, &ret.x );
-
-    return ret;
+	CustomHinge* joint = (CustomHinge*) GetSupportJoint();
+	joint->EnableLimits(state);
 }
 
-unsigned _CDECL Hinge::newtonCallback( const NewtonJoint* hinge, NewtonHingeSliderUpdateDesc* desc )
+
+void Hinge::setLimits(Ogre::Radian minAngle, Ogre::Radian maxAngle)
 {
-    Hinge* me = (Hinge*)NewtonJointGetUserData( hinge );
+	CustomHinge* joint = (CustomHinge*) GetSupportJoint();
 
-    me->m_desc = desc;
-    me->m_retval = 0;
-
-    if (me->m_callback)
-        (*me->m_callback)( me );
-
-    me->m_desc = NULL;
-
-    return me->m_retval;
+	joint->SetLimis(minAngle.valueRadians(), maxAngle.valueRadians());
 }
 
-/////// CALLBACK FUNCTIONS ///////
-void Hinge::setCallbackAccel( Ogre::Real accel )
+void Hinge::setDesiredOmega(Ogre::Radian omega, Ogre::Real strength)
 {
-    if (m_desc)
-    {
-        m_retval = 1;
-        m_desc->m_accel = (float)accel;
-    }
+	m_desiredOmega = omega;
+	m_motorStrength = strength;
+	
+	m_constraintType = CONSTRAINT_OMEGA;
 }
 
-void Hinge::setCallbackFrictionMin( Ogre::Real min )
+void Hinge::setTorque(Ogre::Real torque)
 {
-    if (m_desc)
-    {
-        m_retval = 1;
-        m_desc->m_minFriction = (float)min;
-    }
+	m_motorTorque = torque;
+	m_desiredOmega = 0.0f;
+	
+	m_torqueOn = true;
 }
 
-void Hinge::setCallbackFrictionMax( Ogre::Real max )
+void Hinge::setDesiredAngle(Ogre::Radian angle, Ogre::Real minFriction, Ogre::Real maxFriction)
 {
-    if (m_desc)
-    {
-        m_retval = 1;
-        m_desc->m_maxFriction = (float)max;
-    }
+	m_desiredAngle = angle;
+	m_motorMinFriction = minFriction;
+	m_motorMaxFriction = maxFriction;
+	
+	m_constraintType = CONSTRAINT_ANGLE;
 }
 
-Ogre::Real Hinge::getCallbackTimestep() const
+void Hinge::setBrake(Ogre::Real maxForce)
 {
-    if (m_desc)
-        return (Ogre::Real)m_desc->m_timestep;
-    else
-        return 0.0;
+	m_brakeMaxForce = maxForce;
+	m_constraintType = CONSTRAINT_BRAKE;
 }
 
-Ogre::Real Hinge::calculateStopAlpha( Ogre::Radian angle ) const
+Ogre::Radian Hinge::getJointAngle () const
 {
-    if (m_desc)
-        return (Ogre::Real)NewtonHingeCalculateStopAlpha( m_joint, m_desc, (float)angle.valueRadians() );
-    else
-        return 0.0;
+	CustomHinge* joint = (CustomHinge*) GetSupportJoint();
+
+	return Ogre::Radian(joint->GetJointAngle());
+}
+
+Ogre::Radian Hinge::getJointAngularVelocity () const
+{
+	CustomHinge* joint = (CustomHinge*) GetSupportJoint();
+
+	return Ogre::Radian(joint->GetJointOmega());
+}
+
+Ogre::Vector3 Hinge::getJointPin () const
+{
+	CustomHinge* joint = (CustomHinge*) GetSupportJoint();
+	dVector pin (joint->GetPinAxis());
+
+	return Ogre::Vector3 (pin.m_x, pin.m_y, pin.m_z);
+
+}
+
+void Hinge::submitConstraint(Ogre::Real timestep, int threadindex)
+{
+	if (m_constraintType == CONSTRAINT_BRAKE)
+	{
+		Ogre::Vector3 pin (getJointPin());
+		
+		addAngularRow (Ogre::Radian(0), pin);
+		setRowStiffness(1.0f);
+
+		if (m_brakeMaxForce > 0.0f)
+		{
+			setRowMinimumFriction(-m_brakeMaxForce);
+			setRowMaximumFriction(m_brakeMaxForce);
+		}
+	}
+	else if (m_constraintType == CONSTRAINT_OMEGA)
+	{
+		Ogre::Radian relativeOmega = (m_desiredOmega - getJointAngularVelocity()) * m_motorStrength;
+
+		Ogre::Real acceleration = relativeOmega.valueRadians() / timestep;
+		Ogre::Vector3 pin (getJointPin());
+
+		addAngularRow (Ogre::Radian (0.0f), pin);
+		setRowAcceleration (acceleration);
+	}
+	else if (m_constraintType == CONSTRAINT_ANGLE)
+	{
+		Ogre::Radian relativeAngle = getJointAngle() - m_desiredAngle;
+
+		Ogre::Vector3 pin (getJointPin());
+		
+		addAngularRow (relativeAngle, pin);
+		setRowStiffness(1.0f);
+
+		if (m_motorMinFriction < 0.0f)
+		{
+			setRowMinimumFriction(m_motorMinFriction);
+		}
+		
+		if (m_motorMaxFriction > 0.0f)
+		{
+			setRowMaximumFriction(m_motorMaxFriction);
+		}
+	}
+
+	if (m_torqueOn)
+	{
+		if (getBody0() != NULL)
+		{
+			Ogre::Vector3 pin (getJointPin());
+
+			getBody0()->addTorque(pin * m_motorTorque);
+
+			if (getBody1() != NULL)
+			{
+				getBody1()->addTorque(pin * -m_motorTorque);
+			}
+		}
+	}
+
+	m_lastConstraintType = m_constraintType;
 }
 
 
@@ -182,32 +212,135 @@ Ogre::Real Hinge::calculateStopAlpha( Ogre::Radian angle ) const
 
 
 
-Slider::Slider( const World* world, const OgreNewt::Body* child, const OgreNewt::Body* parent, const Ogre::Vector3& pos, const Ogre::Vector3& pin ) : Joint()
+Slider::Slider(const OgreNewt::Body* child, const OgreNewt::Body* parent, const Ogre::Vector3& pos, const Ogre::Vector3& pin ) : Joint()
 {
-    m_world = world;
+	NewtonCustomJoint* suppportJoint;
 
-    if (parent)
-    {
-        m_joint = NewtonConstraintCreateSlider( world->getNewtonWorld(), &pos.x, &pin.x,
-                                                child->getNewtonBody(), parent->getNewtonBody() );
-    }
-    else
-    {
-        m_joint = NewtonConstraintCreateSlider( world->getNewtonWorld(), &pos.x, &pin.x,
-                                                child->getNewtonBody(), NULL );
-    }
+	// make the joint matrix 
+	dVector dir (pin.x, pin.y, pin.z, 0.0f);
+	dMatrix pinsAndPivoFrame (dgGrammSchmidt(dir));
+	pinsAndPivoFrame.m_posit = dVector (pos.x, pos.y, pos.z, 1.0f);
 
-    NewtonJointSetUserData( m_joint, this );
-    NewtonJointSetDestructor( m_joint, destructor );
-    NewtonSliderSetUserCallback( m_joint, newtonCallback );
-
-    m_callback = NULL;
+	// crate a Newton Custom joint and set it at the support joint	
+	suppportJoint = new CustomSlider (pinsAndPivoFrame, child->getNewtonBody(), parent ? parent->getNewtonBody() : NULL);
+	SetSupportJoint(suppportJoint);
 }
 
 Slider::~Slider()
 {
 }
 
+
+void Slider::enableLimits(bool state)
+{
+	CustomSlider* joint = (CustomSlider*) GetSupportJoint();
+	joint->EnableLimits(state);
+}
+
+
+void Slider::setLimis(Ogre::Real minStopDist, Ogre::Real maxStopDist)
+{
+	CustomSlider* joint = (CustomSlider*) GetSupportJoint();
+	joint->SetLimis(minStopDist, maxStopDist);
+}
+
+
+UpVector::UpVector( const Body* body, const Ogre::Vector3& pin ) : Joint() ,m_pin(pin.normalisedCopy())
+{
+   dVector dPin(m_pin.x, m_pin.y, m_pin.z, 1.0f);
+   CustomUpVector* support_joint = new CustomUpVector(dPin, body->getNewtonBody());
+   SetSupportJoint(support_joint);
+}
+
+UpVector::~UpVector()
+{
+}
+
+void UpVector::setPin( const Ogre::Vector3& pin )
+{
+   CustomUpVector* up_vector = static_cast<CustomUpVector*>(m_joint);
+   m_pin = pin.normalisedCopy();
+   dVector dPin(m_pin.x, m_pin.y, m_pin.z, 1.0f);
+   up_vector->SetPinDir(dPin);
+}
+
+const Ogre::Vector3& UpVector::getPin() const
+{
+   return m_pin;
+}
+
+
+KinematicController::KinematicController(const OgreNewt::Body* child, const Ogre::Vector3& pos)
+{
+	NewtonCustomJoint* suppportJoint;
+
+	// make the joint matrix 
+	dVector attachement (pos.x, pos.y, pos.z, 0.0f);
+
+	// crate a Newton Custom joint and set it at the support joint	
+	suppportJoint = new CustomKinematicController (child->getNewtonBody(), attachement);
+	SetSupportJoint(suppportJoint);
+}
+
+KinematicController::~KinematicController()
+{
+}
+
+void KinematicController::setPickingMode (int mode)
+{
+	CustomKinematicController* joint = (CustomKinematicController*) GetSupportJoint();
+	joint->SetPickMode(mode);
+}
+
+void KinematicController::setMaxLinearFriction(dFloat accel)
+{
+	CustomKinematicController* joint = (CustomKinematicController*) GetSupportJoint();
+	joint->SetMaxLinearFriction(accel);
+}
+
+void KinematicController::setMaxAngularFriction(dFloat alpha)
+{
+	CustomKinematicController* joint = (CustomKinematicController*) GetSupportJoint();
+	joint->SetMaxAngularFriction(alpha);
+}
+
+
+void KinematicController::setTargetPosit (const Ogre::Vector3& position)
+{
+	dVector posit (position.x, position.y, position.z, 0.0f);
+	CustomKinematicController* joint = (CustomKinematicController*) GetSupportJoint();
+	joint->SetTargetPosit(posit);
+}
+
+void KinematicController::setTargetRotation (const Ogre::Quaternion& rotation)
+{
+	dQuaternion rotat (rotation.w, rotation.x, rotation.y, rotation.z) ;
+
+	CustomKinematicController* joint = (CustomKinematicController*) GetSupportJoint();
+	joint->SetTargetRotation(rotat);
+}
+
+
+void KinematicController::setTargetMatrix (const Ogre::Vector3& position, const Ogre::Quaternion& rotation)
+{
+	dMatrix matrix;
+	OgreNewt::Converters::QuatPosToMatrix (rotation, position, &matrix[0][0]);
+	
+	CustomKinematicController* joint = (CustomKinematicController*) GetSupportJoint();
+	joint->SetTargetMatrix(matrix);
+}
+
+void KinematicController::getTargetMatrix (Ogre::Vector3& position, Ogre::Quaternion& rotation) const
+{
+	CustomKinematicController* joint = (CustomKinematicController*) GetSupportJoint();
+	dMatrix matrix (joint->GetTargetMatrix());
+
+	OgreNewt::Converters::MatrixToQuatPos (&matrix[0][0], rotation, position);
+}
+
+
+
+#if 0
 Ogre::Vector3 Slider::getJointForce() const
 {
     Ogre::Vector3 ret;
@@ -424,13 +557,15 @@ Ogre::Vector3 UpVector::getPin() const
 }
 
 
+#endif
 
 
 
-}   // end NAMESPACE BasicJoints
 
 
 
+
+#if 0
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -604,11 +739,58 @@ void CustomRigidJoint::submitConstraint( Ogre::Real timeStep, int threadIndex )
     addAngularRow( angle, globalOrient0 * Ogre::Vector3::UNIT_X );
 }
 
+/*
+CustomDryRollingFriction::CustomDryRollingFriction( OgreNewt::Body* child, Ogre::Real radius, Ogre::Real rollingFrictionCoefficient ) :
+    OgreNewt::CustomJoint(1, child, NULL),
+    mChild(child)
+{
+    Ogre::Real mass;
+    Ogre::Vector3 inertia;
+
+    child->getMassMatrix( mass, inertia );
+
+    mFrictionCoefficient =  rollingFrictionCoefficient;
+    mFrictionTorque = inertia.x * radius;
+}
+
+CustomDryRollingFriction::~CustomDryRollingFriction()
+{
+}
+
+
+// copied from CustomDryRollingFriction joint in newton
+void CustomDryRollingFriction::submitConstraint( Ogre::Real timestep, int threadIndex )
+{
+    Ogre::Vector3 omega;
+    Ogre::Real omegaMag;
+    Ogre::Real torqueFriction;
+
+
+    omega = mChild->getOmega();
+    omegaMag = omega.length();
+
+    if( omegaMag > 0.1f )
+    {
+        addAngularRow(Ogre::Radian(0), omega.normalisedCopy());
+        setRowAcceleration( -omegaMag/timestep );
+        torqueFriction = mFrictionTorque*mFrictionCoefficient;
+        setRowMinimumFriction(-torqueFriction);
+        setRowMaximumFriction(torqueFriction);
+    }
+    else
+    {
+        mChild->setOmega(omega*0.2f);
+    }
+
+}
+*/
 
 
 }   // end NAMESPACE PrebuiltCustomJoints
 
 
+#endif
 
 
 }   // end NAMESPACE OgreNewt
+

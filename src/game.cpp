@@ -12,6 +12,7 @@
 
 #include "game.h"
 #include "objectregistry.h"
+#include "settingsmanager.h"
 #include <boost/shared_ptr.hpp>
 #include "boost/filesystem.hpp"
 #include <boost/filesystem/fstream.hpp>
@@ -118,10 +119,11 @@ MainGame::MainGame()
 {
 	Terrain terrain;
 	{
-		boost::filesystem::ifstream file ( "Media/custom/simple.terrain" );
+		boost::filesystem::ifstream file ( "Media/custom/terrain" );
 		ar::text_iarchive ia ( file );
 		ia >> terrain;
 	}
+	Dout << "My terrain: " << terrain.specification;
 	terrain.node.ID = ObjectRegistry::Instance().addObject ( terrain.specification );
 	InformationManager::Instance()->postDataToFeed ( "create_terrain", DataContainer ( terrain ) );
 }
@@ -215,6 +217,8 @@ bool GameImpl::doStep()
 
 void GameImpl::threadWillStart()
 {
+	SettingsManager::Instance().addSetting("x_res", DataContainer(1024));
+	SettingsManager::Instance().addSetting("y_res", DataContainer(768));
 	subscribeToFeed ( "thread_event", boost::bind ( &GameImpl::handleThreadEvents, this, _1 ) );
 	subscribeToFeed ( "input_keyboard", boost::bind ( &GameImpl::handleKeyEvents, this, _1 ) );
 	subscribeToFeed ( "gui_event", boost::bind ( &GameImpl::handleGUIEvents, this, _1 ) );

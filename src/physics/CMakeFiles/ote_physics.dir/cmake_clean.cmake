@@ -19,7 +19,6 @@ FILE(REMOVE_RECURSE
   "CMakeFiles/ote_physics.dir/OgreNewt_World.cpp.o"
   "CMakeFiles/ote_physics.dir/physics.cpp.o"
   "libote_physics.pdb"
-  "libote_physics.a"
   "libote_physics.so"
 )
 

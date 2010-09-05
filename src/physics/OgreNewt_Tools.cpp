@@ -1,3 +1,4 @@
+#include "OgreNewt_stdafx.h"
 #include "OgreNewt_Tools.h"
 #include "OgreNewt_World.h"
 #include "OgreNewt_Body.h"
@@ -30,22 +31,25 @@ namespace OgreNewt
             // and position Vector3, which is more meaningful for Ogre.
             using namespace Ogre;
             quat = Quaternion( Matrix3( matrix[0], matrix[4], matrix[8],
-                            matrix[1], matrix[5], matrix[9],
-                            matrix[2], matrix[6], matrix[10] ) );
+										matrix[1], matrix[5], matrix[9],
+										matrix[2], matrix[6], matrix[10] ) );
         
             pos = Vector3( matrix[12], matrix[13], matrix[14] );
         }
 
         //! Take a Quaternion and Position Matrix and create a Newton-happy float matrix!
-        void QuatPosToMatrix( const Ogre::Quaternion& quat, const Ogre::Vector3 &pos, float* matrix )
+        void QuatPosToMatrix( const Ogre::Quaternion& _quat, const Ogre::Vector3 &pos, float* matrix )
         {
             // this takes a Quaternion and a Vector3 and creates a float array
             // which is more meaningful to Newton.
+
             using namespace Ogre;
             Matrix3 rot;
             Vector3 xcol, ycol, zcol;
             
-            quat.ToRotationMatrix( rot );   // creates a 3x3 rotation matrix from the Quaternion.
+			Ogre::Quaternion quat (_quat);
+			quat.normalise();
+            quat.ToRotationMatrix (rot);   // creates a 3x3 rotation matrix from the Quaternion.
 
             xcol = rot.GetColumn(0);
             ycol = rot.GetColumn(1);
@@ -77,9 +81,9 @@ namespace OgreNewt
         {
             // from Newton to Ogre::Matrix4
             matrix_out = Ogre::Matrix4( matrix_in[0], matrix_in[4], matrix_in[8], matrix_in[12],
-                matrix_in[1], matrix_in[5], matrix_in[9], matrix_in[13],
-                matrix_in[2], matrix_in[6], matrix_in[10], matrix_in[14],
-                matrix_in[3], matrix_in[7], matrix_in[11], matrix_in[15] );
+										matrix_in[1], matrix_in[5], matrix_in[9], matrix_in[13],
+										matrix_in[2], matrix_in[6], matrix_in[10], matrix_in[14],
+										matrix_in[3], matrix_in[7], matrix_in[11], matrix_in[15] );
         }
 
         void Matrix4ToMatrix( const Ogre::Matrix4& matrix_in, float* matrix_out )
@@ -106,7 +110,27 @@ namespace OgreNewt
             matrix_out[15] = matrix_in[3][3];
         }
 
+		Ogre::Quaternion grammSchmidt( const Ogre::Vector3& pin )
+		{
+			Ogre::Vector3 front, up, right;
+			front = pin;
 
+			front.normalise();
+			if (Ogre::Math::Abs( front.z ) > 0.577f)
+				right = front.crossProduct( Ogre::Vector3(-front.y, front.z, 0.0f) );
+			else
+				right = front.crossProduct( Ogre::Vector3(-front.y, front.x, 0.0f) );
+			right.normalise();
+			up = right.crossProduct( front );
+
+			Ogre::Matrix3 ret;
+			ret.FromAxes( front, up, right );
+
+			Ogre::Quaternion quat;
+			quat.FromRotationMatrix( ret );
+
+			return quat;
+		}
     } // end namespace "converters"
 
     
@@ -202,15 +226,33 @@ namespace OgreNewt
             return NewtonCollisionRayCast( col->getNewtonCollision(), &startPt.x, &endPt.x, &retNorm.x, &retColID );
         }
 
-        Ogre::AxisAlignedBox CollisionCalculateAABB( const OgreNewt::CollisionPtr& col, const Ogre::Quaternion& orient, const Ogre::Vector3& pos )
+        Ogre::AxisAlignedBox CollisionCalculateFittingAABB( const OgreNewt::CollisionPtr& col, const Ogre::Quaternion& orient, const Ogre::Vector3& pos )
         {
-            float matrix[16];
-            Converters::QuatPosToMatrix( orient, pos, matrix );
-            Ogre::Vector3 min, max;
+            Ogre::Vector3 max, min;
 
-            NewtonCollisionCalculateAABB( col->getNewtonCollision(), matrix, &min.x, &max.x );
+            for( int i = 0; i < 3; i++ )
+            {
+                Ogre::Vector3 currentDir, supportVertex;
 
-            return Ogre::AxisAlignedBox( min, max );
+                currentDir = Ogre::Vector3::ZERO;
+                currentDir[i] = 1;
+                currentDir = orient*currentDir;
+                supportVertex = CollisionSupportVertex( col, currentDir ) - pos;
+                max[i] = supportVertex.dotProduct(currentDir);
+
+                currentDir *= -1.0f;
+                supportVertex = CollisionSupportVertex( col, currentDir ) - pos;
+                min[i] = -supportVertex.dotProduct(currentDir);
+            }
+
+            return Ogre::AxisAlignedBox(min, max);
+        }
+
+        Ogre::Vector3 CollisionSupportVertex( const OgreNewt::CollisionPtr& col, const Ogre::Vector3& dir )
+        {
+            Ogre::Vector3 ret;
+            NewtonCollisionSupportVertex( col->getNewtonCollision(), &dir.x, &ret.x );
+            return ret;
         }
 
     }   // end namespace "CollisionTools"
@@ -459,6 +501,8 @@ namespace OgreNewt
                 Ogre::Real maxSquaredRadius;
                 bool first = true;
 
+				#define GetMax(x,y) x>y ? x : y
+
                 // Use iterator
                 String::iterator i, iend;
                 iend = mCaption.end();
@@ -556,7 +600,7 @@ namespace OgreNewt
                     {
                         min.makeFloor(currPos);
                         max.makeCeil(currPos);
-                        maxSquaredRadius = std::max(maxSquaredRadius, currPos.squaredLength());
+                        maxSquaredRadius = GetMax(maxSquaredRadius, currPos.squaredLength());
                     }
 
                     top -= mCharHeight * 2.0;
@@ -578,7 +622,7 @@ namespace OgreNewt
                         currPos = Ogre::Vector3(left - (len / 2), top, -1.0);
                     min.makeFloor(currPos);
                     max.makeCeil(currPos);
-                    maxSquaredRadius = std::max(maxSquaredRadius, currPos.squaredLength());
+                    maxSquaredRadius = GetMax(maxSquaredRadius, currPos.squaredLength());
 
                     top += mCharHeight * 2.0;
                     left += horiz_height * mCharHeight * 2.0;
@@ -601,7 +645,7 @@ namespace OgreNewt
                         currPos = Ogre::Vector3(left - (len / 2), top, -1.0);
                     min.makeFloor(currPos);
                     max.makeCeil(currPos);
-                    maxSquaredRadius = std::max(maxSquaredRadius, currPos.squaredLength());
+                    maxSquaredRadius = GetMax(maxSquaredRadius, currPos.squaredLength());
 
                     //-------------------------------------------------------------------------------------
                     // Second tri
@@ -619,7 +663,7 @@ namespace OgreNewt
                     currPos = Ogre::Vector3(left, top, -1.0);
                     min.makeFloor(currPos);
                     max.makeCeil(currPos);
-                    maxSquaredRadius = std::max(maxSquaredRadius, currPos.squaredLength());
+                    maxSquaredRadius = GetMax(maxSquaredRadius, currPos.squaredLength());
 
                     top -= mCharHeight * 2.0;
                     left -= horiz_height  * mCharHeight * 2.0;
@@ -637,7 +681,7 @@ namespace OgreNewt
                     currPos = Ogre::Vector3(left, top, -1.0);
                     min.makeFloor(currPos);
                     max.makeCeil(currPos);
-                    maxSquaredRadius = std::max(maxSquaredRadius, currPos.squaredLength());
+                    maxSquaredRadius = GetMax(maxSquaredRadius, currPos.squaredLength());
 
                     left += horiz_height  * mCharHeight * 2.0;
 
@@ -655,7 +699,7 @@ namespace OgreNewt
                     currPos = Ogre::Vector3(left, top, -1.0);
                     min.makeFloor(currPos);
                     max.makeCeil(currPos);
-                    maxSquaredRadius = std::max(maxSquaredRadius, currPos.squaredLength());
+                    maxSquaredRadius = GetMax(maxSquaredRadius, currPos.squaredLength());
 
                     // Go back up with top
                     top += mCharHeight * 2.0;

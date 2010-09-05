@@ -12,6 +12,7 @@
 
 #include "input.h"
 #include "FeedDataTypes.h"
+#include "settingsmanager.h"
 
 //Use this define to signify OIS will be used as a DLL
 //(so that dll import/export macros are in effect)
@@ -73,8 +74,8 @@ void InputImpl::threadWillStart()
 		pl.insert(std::make_pair(std::string("w32_keyboard"), std::string("DISCL_FOREGROUND"))); 
 		pl.insert(std::make_pair(std::string("w32_keyboard"), std::string("DISCL_NONEXCLUSIVE"))); 
 #elif defined OIS_LINUX_PLATFORM 
-		pl.insert(std::make_pair(std::string("x11_mouse_grab"), std::string("false"))); 
-		pl.insert(std::make_pair(std::string("x11_mouse_hide"), std::string("false"))); 
+		pl.insert(std::make_pair(std::string("x11_mouse_grab"), std::string("true"))); 
+		pl.insert(std::make_pair(std::string("x11_mouse_hide"), std::string("true"))); 
 		pl.insert(std::make_pair(std::string("x11_keyboard_grab"), std::string("false"))); 
 		pl.insert(std::make_pair(std::string("XAutoRepeatOn"), std::string("true"))); 
 #endif 
@@ -87,8 +88,11 @@ void InputImpl::threadWillStart()
 	mMouse = static_cast<OIS::Mouse*>(mInputManager->createInputObject( OIS::OISMouse, true ));
 	
 	mMouse->setEventCallback(this);
-	mMouse->hide(true);
+	//mMouse->hide(true);
 	mKeyboard->setEventCallback(this);
+	const OIS::MouseState &mouseState =  mMouse->getMouseState();
+	mouseState.width = boost::any_cast<int>(SettingsManager::Instance().getSetting("x_res").data);
+	mouseState.height = boost::any_cast<int>(SettingsManager::Instance().getSetting("y_res").data);
 }
 
 void InputImpl::threadWillStop()

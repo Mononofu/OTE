@@ -1,10 +1,12 @@
+#include "OgreNewt_stdafx.h"
+#include "OgreNewt_stdafx.h"
 #include "OgreNewt_Vehicle.h"
 #include "OgreNewt_Tools.h"
 
+
+#if 0
 namespace OgreNewt
 {
-
-#ifdef INCLUDE_VEHICLE
 ////////////////////////////////////////////////////////
 // TIRE FUNCTIONS
 
@@ -158,22 +160,7 @@ namespace OgreNewt
         delete vehicle;
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+}   // end NAMESPACE OgreNewt
 
 #endif
-
-
-}   // end NAMESPACE OgreNewt
 

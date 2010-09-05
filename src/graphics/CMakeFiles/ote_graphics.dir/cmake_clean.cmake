@@ -2,7 +2,6 @@ FILE(REMOVE_RECURSE
   "CMakeFiles/ote_graphics.dir/graphics.cpp.o"
   "CMakeFiles/ote_graphics.dir/listener.cpp.o"
   "libote_graphics.pdb"
-  "libote_graphics.a"
   "libote_graphics.so"
 )
 

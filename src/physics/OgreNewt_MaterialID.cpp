@@ -1,3 +1,4 @@
+#include "OgreNewt_stdafx.h"
 #include "OgreNewt_MaterialID.h"
 #include "OgreNewt_World.h"
 

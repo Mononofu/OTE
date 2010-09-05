@@ -1,15 +1,14 @@
+#include "OgreNewt_stdafx.h"
+#include "OgreNewt_Body.h"
+#include "OgreNewt_World.h"
 #include "OgreNewt_RayCast.h"
 #include "OgreNewt_Tools.h"
 #include "OgreNewt_Debugger.h"
-#include "OgreNewt_World.h"
 #include "OgreNewt_Collision.h"
-#include "OgreNewt_Body.h"
 
 
 namespace OgreNewt
 {
-
-
     Raycast::Raycast()  {}
     Raycast::~Raycast() {}
 
@@ -108,6 +107,8 @@ namespace OgreNewt
 
     void BasicRaycast::go(const OgreNewt::World* world, const Ogre::Vector3& startpt, const Ogre::Vector3& endpt, bool sorted)
     {
+		// clean the list each time this function is called this way it can be re used for multiple casting. 
+		mRayList.clear();
         Raycast::go( world, startpt, endpt );
         if( sorted )
         {
@@ -144,16 +145,18 @@ namespace OgreNewt
     }
 
 
-    BasicRaycast::BasicRaycastInfo BasicRaycast::getInfoAt( int hitnum ) const
+    BasicRaycast::BasicRaycastInfo BasicRaycast::getInfoAt( unsigned int hitnum ) const
     {
-        BasicRaycast::BasicRaycastInfo ret;
+		if (hitnum < mRayList.size())
+		{
+			return mRayList.at(hitnum);
+		}
+		else
+		{
+			BasicRaycast::BasicRaycastInfo emptyInfo;
 
-        if ((hitnum < 0) || (hitnum >= mRayList.size()))
-            return ret;
-
-        ret = mRayList.at(hitnum);
-
-        return ret;
+			return emptyInfo;
+		}
     }
 
     bool BasicRaycast::userCallback( OgreNewt::Body* body, Ogre::Real distance, const Ogre::Vector3& normal, int collisionID )
@@ -170,170 +173,6 @@ namespace OgreNewt
 
         return false;
     }
-
-
-
-
-//-------------------------------------------------------------------------------------
-        Convexcast::Convexcast() :
-            mReturnInfoList(NULL),
-            mReturnInfoListLength(0),
-            mReturnInfoListSize(0)
-        {
-        }
-
-    Convexcast::~Convexcast()
-        {
-            if( mReturnInfoList )
-            {
-                delete[] mReturnInfoList;
-            }
-        }
-
-
-    void Convexcast::go(const OgreNewt::World* world, const OgreNewt::ConvexCollisionPtr& col, const Ogre::Vector3& startpt, const Ogre::Quaternion &colori, const Ogre::Vector3& endpt, int maxcontactscount, int threadIndex)
-    {
-
-        if( world->getDebugger().isRaycastRecording() )
-        {
-            world->getDebugger().addConvexRay(col, startpt, colori, endpt);
-        }
-                // reserve memory
-                if( mReturnInfoListSize < maxcontactscount )
-                {
-                    mReturnInfoListSize = 0;
-                    if( mReturnInfoList )
-                        delete[] mReturnInfoList;
-                    mReturnInfoList = new NewtonWorldConvexCastReturnInfo[maxcontactscount];
-                    mReturnInfoListSize = maxcontactscount;
-                }
-
-                memset(mReturnInfoList, 0, sizeof(mReturnInfoList[0])*mReturnInfoListSize);
-        // perform the cast
-                float matrix[16];
-                OgreNewt::Converters::QuatPosToMatrix(colori, startpt, &matrix[0] );
-                mFirstContactDistance = -1;
-#ifdef __APPLE__
-                mReturnInfoListLength = 
-                    NewtonWorldConvexCast( world->getNewtonWorld(), &matrix[0], (float*)&endpt, col->getNewtonCollision(),
-                                               &mFirstContactDistance, this, OgreNewt::Convexcast::newtonConvexcastPreFilter,
-                                               mReturnInfoList, mReturnInfoListSize);
-#else
-                mReturnInfoListLength = 
-                    NewtonWorldConvexCast( world->getNewtonWorld(), &matrix[0], (float*)&endpt, col->getNewtonCollision(),
-                              &mFirstContactDistance, this, OgreNewt::Convexcast::newtonConvexcastPreFilter,
-                              mReturnInfoList, mReturnInfoListSize, threadIndex);
-#endif
-        
-                //! TODO: that's a hack here!!
-                if( mReturnInfoListLength > 0 )
-                {
-                    mReturnInfoListLength = 1;
-                }
-
-            if( world->getDebugger().isRaycastRecording() && world->getDebugger().isRaycastRecordingHitBodies() )
-            {
-                Body* body;
-                for(int i = 0; i < mReturnInfoListLength; i++)
-                {
-                    body = (OgreNewt::Body*) NewtonBodyGetUserData(mReturnInfoList[i].m_hitBody);
-                    world->getDebugger().addHitBody(body);
-                }
-            }
-    }
-
-    unsigned _CDECL Convexcast::newtonConvexcastPreFilter(const NewtonBody *body, const NewtonCollision *collision, void* userData)
-    {
-        // get our object!
-        Convexcast* me = (Convexcast*)userData;
-
-        Body* bod = (Body*)NewtonBodyGetUserData( body );
-        const World* world = bod->getWorld();
-
-        if (me->userPreFilterCallback( bod ))
-            return 1;
-        else
-        {
-
-            if( world->getDebugger().isRaycastRecording() && world->getDebugger().isRaycastRecordingHitBodies() )
-            {
-                world->getDebugger().addDiscardedBody(bod);
-            }
-
-            return 0;
-        }
-    }
-
-
-
-//-------------------------------------------------------------------------------------
-    BasicConvexcast::ConvexcastContactInfo::ConvexcastContactInfo()
-    {
-        mBody = NULL;
-    }
-
-    BasicConvexcast::ConvexcastContactInfo::~ConvexcastContactInfo() {}
-
-        BasicConvexcast::BasicConvexcast()
-        {
-        }
-
-    BasicConvexcast::BasicConvexcast(const OgreNewt::World* world, const OgreNewt::ConvexCollisionPtr& col, const Ogre::Vector3& startpt, const Ogre::Quaternion &colori, const Ogre::Vector3& endpt, int maxcontactscount, int threadIndex)
-    {
-        go( world, col, startpt, colori, endpt, maxcontactscount, threadIndex);
-    }
-
-    BasicConvexcast::~BasicConvexcast() {}
-
-
-    int BasicConvexcast::calculateBodyHitCount() const
-        {
-            int count = 0;
-            for( int i = 0; i < mReturnInfoListLength; i++ )
-            {
-                int j;
-                for( j = 0; j < i; j++ )
-                    if( mReturnInfoList[i].m_hitBody == mReturnInfoList[j].m_hitBody )
-                        break;
-
-                if( j == i )
-                    count++;
-            }
-
-            return count;
-        }
-
-
-        int BasicConvexcast::getContactsCount() const
-        {
-            return mReturnInfoListLength;
-        }
-
-    BasicConvexcast::ConvexcastContactInfo BasicConvexcast::getInfoAt( int hitnum ) const
-    {
-            ConvexcastContactInfo info;
-
-            if( hitnum < 0 || hitnum >= mReturnInfoListLength )
-                return info;
-
-
-            info.mBody = (OgreNewt::Body*) NewtonBodyGetUserData(mReturnInfoList[hitnum].m_hitBody);
-            info.mCollisionID = mReturnInfoList[hitnum].m_contactID;
-            info.mContactNormal.x = mReturnInfoList[hitnum].m_normal[0];
-            info.mContactNormal.y = mReturnInfoList[hitnum].m_normal[1];
-            info.mContactNormal.z = mReturnInfoList[hitnum].m_normal[2];
-            info.mContactPoint.x = mReturnInfoList[hitnum].m_point[0];
-            info.mContactPoint.y = mReturnInfoList[hitnum].m_point[1];
-            info.mContactPoint.z = mReturnInfoList[hitnum].m_point[2];
-            info.mContactPenetration = mReturnInfoList[hitnum].m_penetration;
-
-        return info;
-    }
-
-        Ogre::Real BasicConvexcast::getDistanceToFirstHit() const
-        {
-            return mFirstContactDistance;
-        }
 
 }   // end NAMESPACE OgreNewt
 

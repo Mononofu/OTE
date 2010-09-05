@@ -1,3 +1,4 @@
+#include "OgreNewt_stdafx.h"
 #include "OgreNewt_CollisionSerializer.h"
 #include "OgreNewt_CollisionPrimitives.h"
 #include "OgreNewt_World.h"
@@ -33,7 +34,8 @@ namespace OgreNewt
   }
 
 
-  CollisionPtr CollisionSerializer::importCollision(Ogre::DataStreamPtr& stream, OgreNewt::World* world)
+  //CollisionPtr CollisionSerializer::importCollision(Ogre::DataStreamPtr& stream, OgreNewt::World* world)
+  CollisionPtr CollisionSerializer::importCollision(Ogre::DataStream& stream, OgreNewt::World* world)
   {
       CollisionPtr dest;
 
@@ -96,8 +98,10 @@ namespace OgreNewt
 
   void CollisionSerializer::_newtonDeserializeCallback(void* deserializeHandle, void* buffer, int size)
   {
-    Ogre::DataStreamPtr ptr =* (static_cast<Ogre::DataStreamPtr*>(deserializeHandle));
-    ptr->read(buffer, size);
+//  Ogre::DataStreamPtr ptr =* (static_cast<Ogre::DataStreamPtr*>(deserializeHandle));
+	Ogre::DataStream& ptr = * (static_cast<Ogre::DataStream*>(deserializeHandle));
+
+    ptr.read(buffer, size);
   }
 }   // end namespace OgreNewt
 

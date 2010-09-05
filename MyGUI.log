@@ -1,72 +1,102 @@
- ---------------------------------------------------------------------------------------------------------------------------------- 
-                                          loging report for : 07/05/2009   15:19:16
- ---------------------------------------------------------------------------------------------------------------------------------- 
-
-15:19:16  |  General  |  Info  |  * Initialise: Gui  |  MyGUI_Gui.cpp  |  54
-15:19:16  |  General  |  Info  |  * MyGUI version 2.2.2  |  MyGUI_Gui.cpp  |  58
-15:19:16  |  General  |  Info  |  Viewport : 1024 768  |  MyGUI_Gui.cpp  |  68
-15:19:16  |  General  |  Info  |  * Initialise: ResourceManager  |  MyGUI_ResourceManager.cpp  |  41
-15:19:16  |  General  |  Info  |  ResourceManager successfully initialized  |  MyGUI_ResourceManager.cpp  |  53
-15:19:16  |  General  |  Info  |  * Initialise: LayerManager  |  MyGUI_LayerManager.cpp  |  41
-15:19:16  |  General  |  Info  |  LayerManager successfully initialized  |  MyGUI_LayerManager.cpp  |  73
-15:19:16  |  General  |  Info  |  * Initialise: WidgetManager  |  MyGUI_WidgetManager.cpp  |  62
-15:19:16  |  General  |  Info  |  * Register widget factory 'Widget'  |  MyGUI_WidgetManager.cpp  |  118
-15:19:16  |  General  |  Info  |  * Register widget factory 'Button'  |  MyGUI_WidgetManager.cpp  |  118
-15:19:16  |  General  |  Info  |  * Register widget factory 'Window'  |  MyGUI_WidgetManager.cpp  |  118
-15:19:16  |  General  |  Info  |  * Register widget factory 'List'  |  MyGUI_WidgetManager.cpp  |  118
-15:19:16  |  General  |  Info  |  * Register widget factory 'HScroll'  |  MyGUI_WidgetManager.cpp  |  118
-15:19:16  |  General  |  Info  |  * Register widget factory 'VScroll'  |  MyGUI_WidgetManager.cpp  |  118
-15:19:16  |  General  |  Info  |  * Register widget factory 'Edit'  |  MyGUI_WidgetManager.cpp  |  118
-15:19:16  |  General  |  Info  |  * Register widget factory 'ComboBox'  |  MyGUI_WidgetManager.cpp  |  118
-15:19:16  |  General  |  Info  |  * Register widget factory 'StaticText'  |  MyGUI_WidgetManager.cpp  |  118
-15:19:16  |  General  |  Info  |  * Register widget factory 'Tab'  |  MyGUI_WidgetManager.cpp  |  118
-15:19:16  |  General  |  Info  |  * Register widget factory 'TabItem'  |  MyGUI_WidgetManager.cpp  |  118
-15:19:16  |  General  |  Info  |  * Register widget factory 'TabItem'  |  MyGUI_WidgetManager.cpp  |  118
-15:19:16  |  General  |  Info  |  * Register widget factory 'Sheet'  |  MyGUI_WidgetManager.cpp  |  118
-15:19:16  |  General  |  Info  |  * Register widget factory 'Progress'  |  MyGUI_WidgetManager.cpp  |  118
-15:19:16  |  General  |  Info  |  * Register widget factory 'ItemBox'  |  MyGUI_WidgetManager.cpp  |  118
-15:19:16  |  General  |  Info  |  * Register widget factory 'MultiList'  |  MyGUI_WidgetManager.cpp  |  118
-15:19:16  |  General  |  Info  |  * Register widget factory 'StaticImage'  |  MyGUI_WidgetManager.cpp  |  118
-15:19:16  |  General  |  Info  |  * Register widget factory 'Message'  |  MyGUI_WidgetManager.cpp  |  118
-15:19:16  |  General  |  Info  |  * Register widget factory 'RenderBox'  |  MyGUI_WidgetManager.cpp  |  118
-15:19:16  |  General  |  Info  |  * Register widget factory 'MenuCtrl'  |  MyGUI_WidgetManager.cpp  |  118
-15:19:16  |  General  |  Info  |  * Register widget factory 'MenuItem'  |  MyGUI_WidgetManager.cpp  |  118
-15:19:16  |  General  |  Info  |  * Register widget factory 'PopupMenu'  |  MyGUI_WidgetManager.cpp  |  118
-15:19:16  |  General  |  Info  |  * Register widget factory 'MenuBar'  |  MyGUI_WidgetManager.cpp  |  118
-15:19:16  |  General  |  Info  |  * Register widget factory 'ScrollView'  |  MyGUI_WidgetManager.cpp  |  118
-15:19:16  |  General  |  Info  |  * Register widget factory 'DDContainer'  |  MyGUI_WidgetManager.cpp  |  118
-15:19:16  |  General  |  Info  |  * Register widget factory 'Canvas'  |  MyGUI_WidgetManager.cpp  |  118
-15:19:16  |  General  |  Info  |  WidgetManager successfully initialized  |  MyGUI_WidgetManager.cpp  |  93
-15:19:16  |  General  |  Info  |  * Initialise: InputManager  |  MyGUI_InputManager.cpp  |  51
-15:19:16  |  General  |  Info  |  InputManager successfully initialized  |  MyGUI_InputManager.cpp  |  74
-15:19:16  |  General  |  Info  |  * Initialise: SubWidgetManager  |  MyGUI_SubWidgetManager.cpp  |  33
-15:19:16  |  General  |  Info  |  SubWidgetManager successfully initialized  |  MyGUI_SubWidgetManager.cpp  |  49
-15:19:16  |  General  |  Info  |  * Initialise: SkinManager  |  MyGUI_SkinManager.cpp  |  40
-15:19:16  |  General  |  Info  |  SkinManager successfully initialized  |  MyGUI_SkinManager.cpp  |  46
-15:19:16  |  General  |  Info  |  * Initialise: FontManager  |  MyGUI_FontManager.cpp  |  43
-15:19:16  |  General  |  Info  |  FontManager successfully initialized  |  MyGUI_FontManager.cpp  |  47
-15:19:16  |  General  |  Info  |  * Initialise: ControllerManager  |  MyGUI_ControllerManager.cpp  |  36
-15:19:16  |  General  |  Info  |  ControllerManager successfully initialized  |  MyGUI_ControllerManager.cpp  |  40
-15:19:16  |  General  |  Info  |  * Initialise: PointerManager  |  MyGUI_PointerManager.cpp  |  41
-15:19:16  |  General  |  Info  |  PointerManager successfully initialized  |  MyGUI_PointerManager.cpp  |  50
-15:19:16  |  General  |  Info  |  * Initialise: ClipboardManager  |  MyGUI_ClipboardManager.cpp  |  35
-15:19:16  |  General  |  Info  |  ClipboardManager successfully initialized  |  MyGUI_ClipboardManager.cpp  |  44
-15:19:16  |  General  |  Info  |  * Initialise: LayoutManager  |  MyGUI_LayoutManager.cpp  |  41
-15:19:16  |  General  |  Info  |  LayoutManager successfully initialized  |  MyGUI_LayoutManager.cpp  |  47
-15:19:16  |  General  |  Info  |  * Initialise: DynLibManager  |  MyGUI_DynLibManager.cpp  |  34
-15:19:16  |  General  |  Info  |  DynLibManager successfully initialized  |  MyGUI_DynLibManager.cpp  |  36
-15:19:16  |  General  |  Info  |  * Initialise: PluginManager  |  MyGUI_PluginManager.cpp  |  36
-15:19:16  |  General  |  Info  |  PluginManager successfully initialized  |  MyGUI_PluginManager.cpp  |  40
-15:19:16  |  General  |  Info  |  * Initialise: LanguageManager  |  MyGUI_LanguageManager.cpp  |  37
-15:19:16  |  General  |  Info  |  LanguageManager successfully initialized  |  MyGUI_LanguageManager.cpp  |  44
-15:19:16  |  General  |  Info  |  Load ini file 'core_keyboard.xml' from resource group : General  |  MyGUI_ResourceManager.cpp  |  171
-15:19:16  |  General  |  Info  |  Load ini file 'core_language.xml' from resource group : General  |  MyGUI_ResourceManager.cpp  |  171
-15:19:16  |  General  |  Info  |  Load ini file 'core_layer.xml' from resource group : General  |  MyGUI_ResourceManager.cpp  |  171
-15:19:16  |  General  |  Info  |  Load ini file 'core_font.xml' from resource group : General  |  MyGUI_ResourceManager.cpp  |  171
-15:19:16  |  General  |  Info  |  Load ini file 'core_theme.xml' from resource group : General  |  MyGUI_ResourceManager.cpp  |  171
-15:19:16  |  General  |  Info  |  Load ini file 'core_resource.xml' from resource group : General  |  MyGUI_ResourceManager.cpp  |  171
-15:19:16  |  General  |  Info  |  Load ini file 'core_skin.xml' from resource group : General  |  MyGUI_ResourceManager.cpp  |  171
-15:19:16  |  General  |  Info  |  Load ini file 'core_pointer.xml' from resource group : General  |  MyGUI_ResourceManager.cpp  |  171
-15:19:16  |  General  |  Info  |  Gui successfully initialized  |  MyGUI_Gui.cpp  |  112
-15:19:16  |  General  |  Info  |  Font 'Default' using texture size 1024 x 128  |  MyGUI_Font.cpp  |  205
-15:19:16  |  General  |  Info  |  Font 'Default' using real height 17 pixels  |  MyGUI_Font.cpp  |  206
+21:23:57  |  Core  |  Info  |  * Initialise: RenderManager  |  /home/mononofu/Programmieren/my-gui/Platforms/Ogre/OgrePlatform/src/MyGUI_OgreRenderManager.cpp  |  35
+21:23:57  |  Core  |  Info  |  RenderManager successfully initialized  |  /home/mononofu/Programmieren/my-gui/Platforms/Ogre/OgrePlatform/src/MyGUI_OgreRenderManager.cpp  |  63
+21:23:57  |  Core  |  Info  |  * Initialise: DataManager  |  /home/mononofu/Programmieren/my-gui/Platforms/Ogre/OgrePlatform/src/MyGUI_OgreDataManager.cpp  |  26
+21:23:57  |  Core  |  Info  |  DataManager successfully initialized  |  /home/mononofu/Programmieren/my-gui/Platforms/Ogre/OgrePlatform/src/MyGUI_OgreDataManager.cpp  |  30
+21:23:57  |  Core  |  Info  |  * Initialise: Gui  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_Gui.cpp  |  75
+21:23:57  |  Core  |  Info  |  * MyGUI version 3.1.0  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_Gui.cpp  |  80
+21:23:57  |  Core  |  Info  |  * Initialise: ResourceManager  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_ResourceManager.cpp  |  48
+21:23:57  |  Core  |  Info  |  ResourceManager successfully initialized  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_ResourceManager.cpp  |  56
+21:23:57  |  Core  |  Info  |  * Initialise: LayerManager  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_LayerManager.cpp  |  49
+21:23:57  |  Core  |  Info  |  LayerManager successfully initialized  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_LayerManager.cpp  |  57
+21:23:57  |  Core  |  Info  |  * Initialise: WidgetManager  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_WidgetManager.cpp  |  70
+21:23:57  |  Core  |  Info  |  WidgetManager successfully initialized  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_WidgetManager.cpp  |  107
+21:23:57  |  Core  |  Info  |  * Initialise: InputManager  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_InputManager.cpp  |  57
+21:23:57  |  Core  |  Info  |  InputManager successfully initialized  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_InputManager.cpp  |  74
+21:23:57  |  Core  |  Info  |  * Initialise: SubWidgetManager  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_SubWidgetManager.cpp  |  50
+21:23:57  |  Core  |  Info  |  SubWidgetManager successfully initialized  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_SubWidgetManager.cpp  |  72
+21:23:57  |  Core  |  Info  |  * Initialise: SkinManager  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_SkinManager.cpp  |  51
+21:23:57  |  Core  |  Info  |  SkinManager successfully initialized  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_SkinManager.cpp  |  59
+21:23:57  |  Core  |  Info  |  * Initialise: FontManager  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_FontManager.cpp  |  48
+21:23:57  |  Core  |  Info  |  FontManager successfully initialized  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_FontManager.cpp  |  57
+21:23:57  |  Core  |  Info  |  * Initialise: ControllerManager  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_ControllerManager.cpp  |  46
+21:23:57  |  Core  |  Info  |  ControllerManager successfully initialized  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_ControllerManager.cpp  |  56
+21:23:57  |  Core  |  Info  |  * Initialise: PointerManager  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_PointerManager.cpp  |  60
+21:23:57  |  Core  |  Info  |  PointerManager successfully initialized  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_PointerManager.cpp  |  78
+21:23:57  |  Core  |  Info  |  * Initialise: ClipboardManager  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_ClipboardManager.cpp  |  87
+21:23:57  |  Core  |  Info  |  ClipboardManager successfully initialized  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_ClipboardManager.cpp  |  101
+21:23:57  |  Core  |  Info  |  * Initialise: LayoutManager  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_LayoutManager.cpp  |  45
+21:23:57  |  Core  |  Info  |  LayoutManager successfully initialized  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_LayoutManager.cpp  |  50
+21:23:57  |  Core  |  Info  |  * Initialise: DynLibManager  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_DynLibManager.cpp  |  41
+21:23:57  |  Core  |  Info  |  DynLibManager successfully initialized  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_DynLibManager.cpp  |  45
+21:23:57  |  Core  |  Info  |  * Initialise: PluginManager  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_PluginManager.cpp  |  45
+21:23:57  |  Core  |  Info  |  PluginManager successfully initialized  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_PluginManager.cpp  |  49
+21:23:57  |  Core  |  Info  |  * Initialise: LanguageManager  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_LanguageManager.cpp  |  45
+21:23:57  |  Core  |  Info  |  LanguageManager successfully initialized  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_LanguageManager.cpp  |  49
+21:23:57  |  Core  |  Info  |  * Initialise: FactoryManager  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_FactoryManager.cpp  |  39
+21:23:57  |  Core  |  Info  |  FactoryManager successfully initialized  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_FactoryManager.cpp  |  41
+21:23:57  |  Core  |  Info  |  * Initialise: ToolTipManager  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_ToolTipManager.cpp  |  47
+21:23:57  |  Core  |  Info  |  ToolTipManager successfully initialized  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_ToolTipManager.cpp  |  58
+21:23:57  |  Core  |  Info  |  Load ini file 'core_keyboard.xml'  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_ResourceManager.cpp  |  123
+21:23:57  |  Core  |  Error  |  ResourceManager : 'core_keyboard.xml', delegate for type 'Lang'not found  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_ResourceManager.cpp  |  187
+21:23:57  |  Core  |  Info  |  Load ini file 'core_language.xml'  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_ResourceManager.cpp  |  123
+21:23:57  |  Core  |  Info  |  Load ini file 'core_layer.xml'  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_ResourceManager.cpp  |  123
+21:23:57  |  Core  |  Info  |  Load ini file 'core_font.xml'  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_ResourceManager.cpp  |  123
+21:23:57  |  Core  |  Info  |  ResourceTrueTypeFont 'Default' using texture size 512 x 256  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_ResourceTrueTypeFont.cpp  |  202
+21:23:57  |  Core  |  Info  |  ResourceTrueTypeFont 'Default' using real height 17 pixels  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_ResourceTrueTypeFont.cpp  |  203
+21:23:57  |  Core  |  Info  |  ResourceTrueTypeFont 'DejaVuSans.17' using texture size 256 x 256  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_ResourceTrueTypeFont.cpp  |  202
+21:23:57  |  Core  |  Info  |  ResourceTrueTypeFont 'DejaVuSans.17' using real height 17 pixels  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_ResourceTrueTypeFont.cpp  |  203
+21:23:57  |  Core  |  Info  |  ResourceTrueTypeFont 'DejaVuSans.14' using texture size 256 x 256  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_ResourceTrueTypeFont.cpp  |  202
+21:23:57  |  Core  |  Info  |  ResourceTrueTypeFont 'DejaVuSans.14' using real height 14 pixels  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_ResourceTrueTypeFont.cpp  |  203
+21:23:57  |  Core  |  Info  |  Load ini file 'core_theme.xml'  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_ResourceManager.cpp  |  123
+21:23:57  |  Core  |  Info  |  Load ini file 'core_resource.xml'  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_ResourceManager.cpp  |  123
+21:23:57  |  Core  |  Info  |  Load ini file 'core_skin.xml'  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_ResourceManager.cpp  |  123
+21:23:57  |  Core  |  Info  |  Load ini file 'core_pointer.xml'  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_ResourceManager.cpp  |  123
+21:23:57  |  Core  |  Info  |  Gui successfully initialized  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_Gui.cpp  |  125
+21:24:12  |  Core  |  Info  |  * Shutdown: Gui  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_Gui.cpp  |  132
+21:24:12  |  Core  |  Info  |  * Shutdown: PointerManager  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_PointerManager.cpp  |  85
+21:24:12  |  Core  |  Info  |  PointerManager successfully shutdown  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_PointerManager.cpp  |  101
+21:24:12  |  Core  |  Info  |  * Shutdown: InputManager  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_InputManager.cpp  |  81
+21:24:12  |  Core  |  Info  |  InputManager successfully shutdown  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_InputManager.cpp  |  86
+21:24:12  |  Core  |  Info  |  * Shutdown: SkinManager  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_SkinManager.cpp  |  66
+21:24:12  |  Core  |  Info  |  SkinManager successfully shutdown  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_SkinManager.cpp  |  71
+21:24:12  |  Core  |  Info  |  * Shutdown: SubWidgetManager  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_SubWidgetManager.cpp  |  79
+21:24:12  |  Core  |  Info  |  SubWidgetManager successfully shutdown  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_SubWidgetManager.cpp  |  101
+21:24:12  |  Core  |  Info  |  * Shutdown: LayerManager  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_LayerManager.cpp  |  64
+21:24:12  |  Core  |  Info  |  destroy layer 'Back'  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_LayerManager.cpp  |  207
+21:24:12  |  Core  |  Info  |  destroy layer 'Overlapped'  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_LayerManager.cpp  |  207
+21:24:12  |  Core  |  Info  |  destroy layer 'Middle'  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_LayerManager.cpp  |  207
+21:24:12  |  Core  |  Info  |  destroy layer 'Modal'  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_LayerManager.cpp  |  207
+21:24:12  |  Core  |  Info  |  destroy layer 'Main'  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_LayerManager.cpp  |  207
+21:24:12  |  Core  |  Info  |  destroy layer 'Popup'  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_LayerManager.cpp  |  207
+21:24:12  |  Core  |  Info  |  destroy layer 'FadeMiddle'  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_LayerManager.cpp  |  207
+21:24:12  |  Core  |  Info  |  destroy layer 'Info'  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_LayerManager.cpp  |  207
+21:24:12  |  Core  |  Info  |  destroy layer 'ToolTip'  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_LayerManager.cpp  |  207
+21:24:12  |  Core  |  Info  |  destroy layer 'DragAndDrop'  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_LayerManager.cpp  |  207
+21:24:12  |  Core  |  Info  |  destroy layer 'FadeBusy'  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_LayerManager.cpp  |  207
+21:24:12  |  Core  |  Info  |  destroy layer 'Pointer'  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_LayerManager.cpp  |  207
+21:24:12  |  Core  |  Info  |  destroy layer 'Fade'  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_LayerManager.cpp  |  207
+21:24:12  |  Core  |  Info  |  destroy layer 'Statistic'  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_LayerManager.cpp  |  207
+21:24:12  |  Core  |  Info  |  LayerManager successfully shutdown  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_LayerManager.cpp  |  75
+21:24:12  |  Core  |  Info  |  * Shutdown: FontManager  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_FontManager.cpp  |  64
+21:24:12  |  Core  |  Info  |  FontManager successfully shutdown  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_FontManager.cpp  |  71
+21:24:12  |  Core  |  Info  |  * Shutdown: ControllerManager  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_ControllerManager.cpp  |  63
+21:24:12  |  Core  |  Info  |  ControllerManager successfully shutdown  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_ControllerManager.cpp  |  74
+21:24:12  |  Core  |  Info  |  * Shutdown: ClipboardManager  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_ClipboardManager.cpp  |  108
+21:24:12  |  Core  |  Info  |  ClipboardManager successfully shutdown  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_ClipboardManager.cpp  |  110
+21:24:12  |  Core  |  Info  |  * Shutdown: LayoutManager  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_LayoutManager.cpp  |  57
+21:24:12  |  Core  |  Info  |  LayoutManager successfully shutdown  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_LayoutManager.cpp  |  62
+21:24:12  |  Core  |  Info  |  * Shutdown: PluginManager  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_PluginManager.cpp  |  56
+21:24:12  |  Core  |  Info  |  PluginManager successfully shutdown  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_PluginManager.cpp  |  61
+21:24:12  |  Core  |  Info  |  * Shutdown: DynLibManager  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_DynLibManager.cpp  |  52
+21:24:12  |  Core  |  Info  |  DynLibManager successfully shutdown  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_DynLibManager.cpp  |  59
+21:24:12  |  Core  |  Info  |  * Shutdown: LanguageManager  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_LanguageManager.cpp  |  56
+21:24:12  |  Core  |  Info  |  LanguageManager successfully shutdown  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_LanguageManager.cpp  |  60
+21:24:12  |  Core  |  Info  |  * Shutdown: ResourceManager  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_ResourceManager.cpp  |  63
+21:24:12  |  Core  |  Info  |  ResourceManager successfully shutdown  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_ResourceManager.cpp  |  73
+21:24:12  |  Core  |  Info  |  * Shutdown: FactoryManager  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_FactoryManager.cpp  |  48
+21:24:12  |  Core  |  Info  |  FactoryManager successfully shutdown  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_FactoryManager.cpp  |  50
+21:24:12  |  Core  |  Info  |  * Shutdown: ToolTipManager  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_ToolTipManager.cpp  |  65
+21:24:12  |  Core  |  Info  |  ToolTipManager successfully shutdown  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_ToolTipManager.cpp  |  69
+21:24:12  |  Core  |  Info  |  * Shutdown: WidgetManager  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_WidgetManager.cpp  |  114
+21:24:12  |  Core  |  Info  |  WidgetManager successfully shutdown  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_WidgetManager.cpp  |  123
+21:24:12  |  Core  |  Info  |  Gui successfully shutdown  |  /home/mononofu/Programmieren/my-gui/MyGUIEngine/src/MyGUI_Gui.cpp  |  173

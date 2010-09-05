@@ -218,6 +218,8 @@ struct InputKeyboardEvent
 	input_keyboard_type type;
 };
 
+
+
 struct ObjectToCreate
 {
 	OgreNewt::Node node;
@@ -292,7 +294,7 @@ struct WorldGraph
 				}
 				else
 				{
-					Derr << "Node with NULL-Pointer!";
+					Derr << "OgreNewt::Node with NULL-Pointer!";
 				}
 				
 			}

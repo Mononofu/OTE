@@ -9,6 +9,7 @@ SET(CMAKE_DEPENDS_CHECK_CXX
   "/home/mononofu/Programmieren/OTE/src/main.cpp" "/home/mononofu/Programmieren/OTE/src/CMakeFiles/ote.dir/main.cpp.o"
   "/home/mononofu/Programmieren/OTE/src/objectregistry.cpp" "/home/mononofu/Programmieren/OTE/src/CMakeFiles/ote.dir/objectregistry.cpp.o"
   "/home/mononofu/Programmieren/OTE/src/resourcemanager.cpp" "/home/mononofu/Programmieren/OTE/src/CMakeFiles/ote.dir/resourcemanager.cpp.o"
+  "/home/mononofu/Programmieren/OTE/src/settingsmanager.cpp" "/home/mononofu/Programmieren/OTE/src/CMakeFiles/ote.dir/settingsmanager.cpp.o"
   )
 SET(CMAKE_CXX_COMPILER_ID "GNU")
 

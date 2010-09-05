@@ -1,3 +1,4 @@
+#include "OgreNewt_stdafx.h"
 #include "OgreNewt_MaterialPair.h"
 #include "OgreNewt_ContactJoint.h"
 

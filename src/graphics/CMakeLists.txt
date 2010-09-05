@@ -2,3 +2,5 @@
 
 #build a shared library
 ADD_LIBRARY(ote_graphics SHARED graphics.cpp listener.cpp)
+
+TARGET_LINK_LIBRARIES(ote_graphics MyGUI.OgrePlatform MyGUIEngine)

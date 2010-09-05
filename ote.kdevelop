@@ -38,7 +38,7 @@
     </build>
     <make>
       <abortonerror>false</abortonerror>
-      <numberofjobs>1</numberofjobs>
+      <numberofjobs>4</numberofjobs>
       <dontact>false</dontact>
       <makebin>/usr/bin/make </makebin>
       <selectedenvironment>default</selectedenvironment>

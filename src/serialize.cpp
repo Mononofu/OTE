@@ -13,12 +13,12 @@ int main()
 	OgreNewt::Node node;
 	std::cout << sizeof(node) << std::endl;
 	Terrain terrain;
-	terrain.node.pos = Ogre::Vector3(0,0,0);
+	terrain.node.pos = Ogre::Vector3(1,2,3);
 	terrain.scale = Ogre::Vector3(2.0, 2.0, 2.0);
 	terrain.node.ID = -1;
-	terrain.specification = "simple_terrain.mesh";
+	terrain.specification = "playground.mesh";
 	
-	fs::ofstream file("Media/custom/simple.terrain");
+	fs::ofstream file("Media/custom/terrain");
 	ar::text_oarchive oa(file);
 	oa << terrain;
 }

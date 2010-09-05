@@ -72,17 +72,20 @@ void PssmShadowCasterFP
 #endif
 }
 
-float shadowPCF(sampler2D shadowMap, float4 shadowMapPos, float2 offset)
+float shadowPCF(sampler2D shadowMap, float4 shadowMapPos, float2 offset, float shadowBias)
 {
     shadowMapPos = shadowMapPos / shadowMapPos.w;
+
     float2 uv = shadowMapPos.xy;
-    float3 o = float3(offset, -offset.x) * 0.3f;
+    float4 o = float4(offset, -offset) * 0.3f;
+
+    float compValue = shadowMapPos.z + shadowBias;
 
     float result = 0;
-    result += (shadowMapPos.z <= tex2D(shadowMap, uv.xy - o.xy).r) ? 1 : 0;
-    result += (shadowMapPos.z <= tex2D(shadowMap, uv.xy + o.xy).r) ? 1 : 0;
-    result += (shadowMapPos.z <= tex2D(shadowMap, uv.xy + o.zy).r) ? 1 : 0;
-    result += (shadowMapPos.z <= tex2D(shadowMap, uv.xy - o.zy).r) ? 1 : 0;
+    result += (compValue <= tex2D(shadowMap, uv.xy + o.xy).r) ? 1 : 0;
+    result += (compValue <= tex2D(shadowMap, uv.xy + o.xw).r) ? 1 : 0;
+    result += (compValue <= tex2D(shadowMap, uv.xy + o.zy).r) ? 1 : 0;
+    result += (compValue <= tex2D(shadowMap, uv.xy + o.zw).r) ? 1 : 0;
     return result / 4;
 }
 
@@ -144,6 +147,7 @@ void MainFP
     uniform float4 invShadowMapSize1,
     uniform float4 invShadowMapSize2,
     uniform float4 pssmSplitPoints,
+    uniform float shadowBias,
 
     uniform sampler2D shadowMap0 : register(s0),
     uniform sampler2D shadowMap2 : register(s2),
@@ -189,13 +193,13 @@ void MainFP
     float4 splitColour;
     if (iSplitPoint <= pssmSplitPoints.y) {
         splitColour = float4(0.1, 0, 0, 1);
-        shadowing = shadowPCF(shadowMap0, iLightPosition0, invShadowMapSize0.xy);
+        shadowing = shadowPCF(shadowMap0, iLightPosition0, invShadowMapSize0.xy, shadowBias);
     } else if (iSplitPoint <= pssmSplitPoints.z) {
         splitColour = float4(0, 0.1, 0, 1);
-        shadowing = shadowPCF(shadowMap1, iLightPosition1, invShadowMapSize1.xy);
+        shadowing = shadowPCF(shadowMap1, iLightPosition1, invShadowMapSize1.xy, shadowBias);
     } else {
         splitColour = float4(0.1, 0.1, 0, 1);
-        shadowing = shadowPCF(shadowMap2, iLightPosition2, invShadowMapSize2.xy);
+        shadowing = shadowPCF(shadowMap2, iLightPosition2, invShadowMapSize2.xy, shadowBias);
     }
 
     // Can check that splitting is done correctly:

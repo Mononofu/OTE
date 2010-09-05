@@ -1,7 +1,11 @@
+#include "OgreNewt_stdafx.h"
 #include "OgreNewt_Debugger.h"
 #include "OgreNewt_World.h"
 #include "OgreNewt_Body.h"
+#include "OgreNewt_Joint.h"
 #include "OgreNewt_Collision.h"
+
+#include <NewtonCustomJoint.h>
 
 #include <sstream>
 
@@ -54,6 +58,8 @@ void Debugger::init( Ogre::SceneManager* smgr )
         m_raycastsnode = smgr->getRootSceneNode()->createChildSceneNode("__OgreNewt__Raycasts_Debugger__Node__");
         m_raycastsnode->setListener(this);
     }
+
+	m_sceneManager = smgr;
 }
 
 void Debugger::deInit()
@@ -96,17 +102,18 @@ void Debugger::nodeDestroyed (const Ogre::Node *node)
 
 void Debugger::clearBodyDebugDataCache()
 {
-        for(BodyDebugDataMap::iterator it = m_cachemap.begin(); it != m_cachemap.end(); it++)
-        {
-            Ogre::ManualObject* mo = it->second.m_lines;
-            if( mo )
-                delete mo;
-            OgreNewt::OgreAddons::MovableText *text = it->second.m_text;
-            if( text )
-                delete text;
-        }
-        m_cachemap.clear();
+	for(BodyDebugDataMap::iterator it = m_cachemap.begin(); it != m_cachemap.end(); it++)
+	{
+		Ogre::ManualObject* mo = it->second.m_lines;
+		if( mo )
+			delete mo;
+		OgreNewt::OgreAddons::MovableText *text = it->second.m_text;
+		if( text )
+			delete text;
+	}
+	m_cachemap.clear();
 }
+
 
 
 void Debugger::showDebugInformation( )
@@ -121,15 +128,16 @@ void Debugger::showDebugInformation( )
     {
         processBody(body);
     }
-        
-
+    
+	// display any joint debug information
+	NewtonWorldForEachJointDo (m_world->getNewtonWorld(), newtonprocessJoints, this);
 
     // delete old entries
-    BodyDebugDataMap newmap;
+    BodyDebugDataMap newbodymap;
     for(BodyDebugDataMap::iterator it = m_cachemap.begin(); it != m_cachemap.end(); it++)
     {
         if( it->second.m_updated )
-            newmap.insert(*it);
+            newbodymap.insert(*it);
         else
         {
             Ogre::ManualObject* mo = it->second.m_lines;
@@ -140,7 +148,7 @@ void Debugger::showDebugInformation( )
                 delete text;
         }
     }
-    m_cachemap.swap(newmap);
+    m_cachemap.swap(newbodymap);
 }
 
 void Debugger::hideDebugInformation()
@@ -160,35 +168,77 @@ void Debugger::setDefaultColor(Ogre::ColourValue col)
     m_defaultcolor = col;
 }
 
+
+void _CDECL Debugger::newtonprocessJoints (const NewtonJoint* newtonJoint, void* userData)
+{
+	Debugger* me = (Debugger*) userData;
+	NewtonCustomJoint* customJoint = (NewtonCustomJoint*) NewtonJointGetUserData(newtonJoint);
+	me->processJoint((Joint*) customJoint->GetUserData());
+}
+
+
+void Debugger::processJoint(Joint* joint)
+{
+	// show joint info
+	joint->showDebugData(m_debugnode);
+}
+
+
+void Debugger::buildDebugObjectFromCollision(Ogre::ManualObject* object, Ogre::ColourValue colour, const OgreNewt::Collision& shape) const
+{
+	object->begin("BaseWhiteNoLighting", Ogre::RenderOperation::OT_LINE_LIST );
+
+	// set color
+//	if( it != m_materialcolors.end() )
+//		object->colour(it->second);
+//	else
+//		object->colour(m_defaultcolor);
+
+	object->colour(colour);
+
+	float matrix[16];
+	Converters::QuatPosToMatrix(Ogre::Quaternion::IDENTITY, Ogre::Vector3::ZERO, &matrix[0]);
+
+	NewtonCollisionForEachPolygonDo (shape.getNewtonCollision(), &matrix[0], newtonPerPoly, object);
+
+	object->end();
+}
+
+
 void Debugger::processBody( OgreNewt::Body* bod )
 {
     NewtonBody* newtonBody = bod->getNewtonBody();
     MaterialIdColorMap::iterator it = m_materialcolors.find( NewtonBodyGetMaterialGroupID(newtonBody) );
 
-
-    Ogre::Vector3 pos;
+    Ogre::Vector3 pos, vel, omega;
     Ogre::Quaternion ori;
-    bod->getPositionOrientation(pos, ori);
+    bod->getVisualPositionOrientation(pos, ori);
+	
+	vel = bod->getVelocity();
+	omega = bod->getOmega();
 
+	// ----------- create debug-text ------------
+	std::ostringstream oss_name;
+	oss_name << "__OgreNewt__Debugger__Body__" << bod << "__";
+	std::ostringstream oss_info;
+	oss_info.precision(2);
+	oss_info.setf(std::ios::fixed,std::ios::floatfield);
+	Ogre::Vector3 inertia;
+	Ogre::Real mass;
+	bod->getMassMatrix(mass, inertia);
+    
+	oss_info << "[" << bod->getOgreNode()->getName() << "]" << std::endl;
+	oss_info << "Mass: " << mass << std::endl;
+	oss_info << "Position: " << pos[0] << " x " << pos[1] << " x " << pos[2] << std::endl;
+	oss_info << "Velocity: " << vel[0] << " x " << vel[1] << " x " << vel[2] << std::endl;
+	oss_info << "Omega: " << omega[0] << " x " << omega[1] << " x " << omega[2] << std::endl;
+	oss_info << "Inertia: " << inertia[0] << " x " << inertia[1] << " x " << inertia[2] << std::endl;
 
-    // ----------- create debug-text ------------
-    std::ostringstream oss_name;
-    oss_name << "__OgreNewt__Debugger__Body__" << bod << "__";
-    std::ostringstream oss_info;
-    oss_info.precision(2);
-    oss_info.setf(std::ios::fixed,std::ios::floatfield);
-    Ogre::Vector3 inertia;
-    Ogre::Real mass;
-    bod->getMassMatrix(mass, inertia);
-    oss_info << "mass: " << mass << std::endl << "inertia: " << inertia << std::endl;
-    oss_info << "pos: " << pos << std::endl << "ori: " << ori << std::endl;
-    oss_info << "vel: " << bod->getVelocity() << std::endl << "omega: " << bod->getOmega() << std::endl;
     // ----------- ------------------ ------------
-
-
 
     // look for cached data
     BodyDebugData* data = &m_cachemap[bod];
+
     if( data->m_lastcol == bod->getCollision() ) // use cached data
     {
         // set new position...
@@ -214,7 +264,9 @@ void Debugger::processBody( OgreNewt::Body* bod )
             data->m_node = m_debugnode->createChildSceneNode(pos, ori);
 
         if( data->m_lines )
+		{
             data->m_lines->clear();
+		}
         else
         {
             std::ostringstream oss;
@@ -233,10 +285,10 @@ void Debugger::processBody( OgreNewt::Body* bod )
             data->m_text->setLocalTranslation(bod->getAABB().getMaximum().y/2*Ogre::Vector3::UNIT_Y+Ogre::Vector3::UNIT_Y*0.1);
             data->m_text->setTextAlignment( OgreNewt::OgreAddons::MovableText::H_LEFT, OgreNewt::OgreAddons::MovableText::V_ABOVE );
         }
+
         data->m_node->attachObject(data->m_text);
         
-
-
+/*
         data->m_lines->begin("BaseWhiteNoLighting", Ogre::RenderOperation::OT_LINE_LIST );
 
         // set color
@@ -249,11 +301,15 @@ void Debugger::processBody( OgreNewt::Body* bod )
         Converters::QuatPosToMatrix(Ogre::Quaternion::IDENTITY, Ogre::Vector3::ZERO, &matrix[0]);
         
         NewtonCollisionForEachPolygonDo( NewtonBodyGetCollision(newtonBody), &matrix[0], newtonPerPoly, data->m_lines );
-        
         data->m_lines->end();
+*/
+		buildDebugObjectFromCollision (data->m_lines, m_defaultcolor, *bod->getCollision());
+
         data->m_node->attachObject(data->m_lines);
     }
 }
+
+
 
 void _CDECL Debugger::newtonPerPoly( void* userData, int vertexCount, const float* faceVertec, int id )
 {
@@ -279,12 +335,13 @@ void _CDECL Debugger::newtonPerPoly( void* userData, int vertexCount, const floa
 }
 
 
+
+
 // ----------------- raycast-debugging -----------------------
 void Debugger::startRaycastRecording(bool markhitbodies)
 {
     m_recordraycasts = true;
     m_markhitbodies = markhitbodies;
-    clearRaycastsRecorded();
 }
 
 bool Debugger::isRaycastRecording()
@@ -339,7 +396,6 @@ void Debugger::addRay(const Ogre::Vector3 &startpt, const Ogre::Vector3 &endpt)
     std::ostringstream oss;
     oss << "__OgreNewt__Raycast_Debugger__Lines__Raycastline__" << i++ << "__";
     Ogre::ManualObject *line = new Ogre::ManualObject(oss.str());
-    mRecordedRaycastObjects.push_back(line);
 
     line->begin("BaseWhiteNoLighting", Ogre::RenderOperation::OT_LINE_LIST );
     line->colour(m_raycol);
@@ -347,7 +403,14 @@ void Debugger::addRay(const Ogre::Vector3 &startpt, const Ogre::Vector3 &endpt)
     line->position(endpt);
     line->end();
 
-    m_raycastsnode->attachObject(line);    
+#ifndef WIN32
+    m_world->ogreCriticalSectionLock();
+#endif
+    mRecordedRaycastObjects.push_back(line);
+    m_raycastsnode->attachObject(line);
+#ifndef WIN32
+    m_world->ogreCriticalSectionUnlock();
+#endif
 }
 
 void Debugger::addConvexRay(const OgreNewt::ConvexCollisionPtr& col, const Ogre::Vector3 &startpt, const Ogre::Quaternion &colori, const Ogre::Vector3 &endpt)
@@ -360,7 +423,6 @@ void Debugger::addConvexRay(const OgreNewt::ConvexCollisionPtr& col, const Ogre:
     std::ostringstream oss;
     oss << "__OgreNewt__Raycast_Debugger__Lines__Convexcastlines__" << i++ << "__";
     Ogre::ManualObject *line = new Ogre::ManualObject(oss.str());
-    mRecordedRaycastObjects.push_back(line);
 
     line->begin("BaseWhiteNoLighting", Ogre::RenderOperation::OT_LINE_LIST );
     line->colour(m_convexcol);
@@ -397,7 +459,16 @@ void Debugger::addConvexRay(const OgreNewt::ConvexCollisionPtr& col, const Ogre:
 
 
     line->end();
+
+
+#ifndef WIN32
+    m_world->ogreCriticalSectionLock();
+#endif
+    mRecordedRaycastObjects.push_back(line);
     m_raycastsnode->attachObject(line);
+#ifndef WIN32
+    m_world->ogreCriticalSectionUnlock();
+#endif
 }
 
 void Debugger::addDiscardedBody(const OgreNewt::Body* body)
@@ -413,17 +484,25 @@ void Debugger::addDiscardedBody(const OgreNewt::Body* body)
     std::ostringstream oss;
     oss << "__OgreNewt__Raycast_Debugger__Lines__DiscardedBody__" << i++ << "__";
     Ogre::ManualObject *line = new Ogre::ManualObject(oss.str());
-    mRecordedRaycastObjects.push_back(line);
 
     line->begin("BaseWhiteNoLighting", Ogre::RenderOperation::OT_LINE_LIST );
     line->colour(m_prefilterdiscardedcol);
 
-    body->getPositionOrientation(pos, ori);
+    body->getVisualPositionOrientation(pos, ori);
     Converters::QuatPosToMatrix(ori, pos, &matrix[0]);
     NewtonCollisionForEachPolygonDo( body->getCollision()->getNewtonCollision() , &matrix[0], newtonPerPoly, line );
 
     line->end();
+
+
+#ifndef WIN32
+    m_world->ogreCriticalSectionLock();
+#endif
+    mRecordedRaycastObjects.push_back(line);
     m_raycastsnode->attachObject(line);
+#ifndef WIN32
+    m_world->ogreCriticalSectionUnlock();
+#endif
 }
 
 void Debugger::addHitBody(const OgreNewt::Body* body)
@@ -439,17 +518,24 @@ void Debugger::addHitBody(const OgreNewt::Body* body)
     std::ostringstream oss;
     oss << "__OgreNewt__Raycast_Debugger__Lines__HitBody__" << i++ << "__";
     Ogre::ManualObject *line = new Ogre::ManualObject(oss.str());
-    mRecordedRaycastObjects.push_back(line);
 
     line->begin("BaseWhiteNoLighting", Ogre::RenderOperation::OT_LINE_LIST );
     line->colour(m_hitbodycol);
 
-    body->getPositionOrientation(pos, ori);
+    body->getVisualPositionOrientation(pos, ori);
     Converters::QuatPosToMatrix(ori, pos, &matrix[0]);
     NewtonCollisionForEachPolygonDo( body->getCollision()->getNewtonCollision() , &matrix[0], newtonPerPoly, line );
 
     line->end();
+
+#ifndef WIN32
+    m_world->ogreCriticalSectionLock();
+#endif
+    mRecordedRaycastObjects.push_back(line);
     m_raycastsnode->attachObject(line);
+#ifndef WIN32
+    m_world->ogreCriticalSectionUnlock();
+#endif
 }
 
 }   // end namespace OgreNewt

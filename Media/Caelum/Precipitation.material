@@ -29,11 +29,11 @@ fragment_program Caelum/PrecipitationFP cg
 	}
 }
 
-vertex_program VDS/PrecipitationVP cg
+vertex_program Caelum/PrecipitationVP cg
 {
 	source Precipitation.cg
 	entry_point MainVP
-	profiles vs_1_1 arbvp1
+	profiles vs_3_0 vp40 arbvp1
 	
 	default_params
 	{
@@ -47,7 +47,7 @@ material Caelum/PrecipitationMaterial
 	{
 		pass Main
 		{			
-			vertex_program_ref VDS/PrecipitationVP
+			vertex_program_ref Caelum/PrecipitationVP
 			{
 			}
 			

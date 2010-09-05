@@ -87,3 +87,32 @@ Linking CXX executable cmTryCompileExec
 make[1]: Leaving directory `/home/mononofu/Programmieren/OTE/CMakeFiles/CMakeTmp'
 
 
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler: /usr/bin/gcc 
+Build flags: 
+Id flags: 
+
+The output was:
+0
+
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
+
+The C compiler identification is GNU, found in "/home/mononofu/Programmieren/OTE/CMakeFiles/CompilerIdC/a.out"
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+Compiler: /usr/bin/c++ 
+Build flags: 
+Id flags: 
+
+The output was:
+0
+CMakeCXXCompilerId.cpp:76: warning: deprecated conversion from string constant to ‘char*’
+CMakeCXXCompilerId.cpp:189: warning: deprecated conversion from string constant to ‘char*’
+CMakeCXXCompilerId.cpp:190: warning: deprecated conversion from string constant to ‘char*’
+
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
+
+The CXX compiler identification is GNU, found in "/home/mononofu/Programmieren/OTE/CMakeFiles/CompilerIdCXX/a.out"
+
