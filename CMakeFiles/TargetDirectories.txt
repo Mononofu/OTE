@@ -1,0 +1,4 @@
+/home/mononofu/Programmieren/OTE/src/CMakeFiles/ote.dir
+/home/mononofu/Programmieren/OTE/src/graphics/CMakeFiles/ote_graphics.dir
+/home/mononofu/Programmieren/OTE/src/physics/CMakeFiles/ote_physics.dir
+/home/mononofu/Programmieren/OTE/src/CMakeFiles/serializer.dir
